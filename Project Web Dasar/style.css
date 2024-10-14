@@ -1,0 +1,57 @@
+html {
+    margin:0;
+    padding:0;
+}
+
+
+body{
+    background-color: aliceblue;
+    height: auto;
+}
+
+    
+.welcome{
+    list-style: none; background-color: beige;
+    list-style-type: none;
+    padding:20px;
+    margin-right: 930px;
+    height: 5px;
+    justify-content: left;
+
+}
+
+.nav-ul{
+    background-color: beige;
+    height:100px;
+    display:flex;
+    justify-content: left;
+    align-items: center;
+    margin:0;
+    padding:0;
+}
+
+
+
+.nav-li{
+    
+    background-color: beige;
+    list-style-type: none;
+    padding:20px;
+    margin-right: 5px;
+    height: 5px;
+
+
+}
+
+.nav-li:hover{
+    background-color: wheat;
+    transition:  .5s ease-in-out;
+    transition-delay: .2s;
+    border-radius: 10px;
+}
+
+
+
+.a-li {
+    text-decoration: none;
+}
