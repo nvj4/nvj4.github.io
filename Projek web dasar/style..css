@@ -6,7 +6,7 @@
 }
 
 body{
-    background-image:url('bg3.jpeg');
+    background-image:url('bg4.png');
     margin: 0px;
     padding: 0px;
     font-family: 'Open Sana',sans-serif;
@@ -19,7 +19,6 @@ body{
     gap: 20px;
     justify-content: center;
     flex-wrap: wrap;
-
 }
 
 .card {
@@ -30,11 +29,22 @@ body{
     max-width: 300px;
     flex: 1;
     text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+.card:hover {
+    transform: scale(1.05);
+    background-color: lightgreen;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
 .countainer:hover{
     transition: .5s ease-in-out;
     transition-delay: .3s;
 }
+
+
+
 
 .card img {
     width: 100%;
@@ -51,7 +61,7 @@ body{
 
 .card-content p {
     color: #555;
-    font-size: 14px;
+    font-size: 5px;
 }
 
 .card-content button {
@@ -79,8 +89,8 @@ body{
     font-size: 40px;
     font-weight: bold;
     float: left;
-    font-family: 'comic sans ms';
-    color: #0b0606;
+    color: #0b0b0b;
+    font-family: 'Times New Roman', Times, serif;
 }
 
 .menu{
@@ -259,6 +269,7 @@ h3{
         display: block;
         width: 100%;
         text-align: center;
+
     }
 
     nav.menu{
@@ -290,4 +301,119 @@ h3{
     .kartu-tempat{
         width: 50%;
     }
+
+
+    
+@media screen and (max-width: 768px) {
+    nav {
+        flex-direction: row; 
+        justify-content: space-between;
+        padding: 10px;
+    }
+
+    nav ul {
+        display: flex;
+        flex-wrap: wrap; 
+        justify-content: center;
+        padding: 0;
+    }
+
+    nav ul li {
+        margin: 5px; 
+    }
+
+    .navlogo {
+        width: 120px; 
+        height: auto;
+    }
+
+    .container {
+        flex-direction: column; 
+        align-items: center;
+    }
+
+    .card {
+        max-width: 80%; 
+        margin-bottom: 15px;
+    }
 }
+
+
+@media screen and (max-width: 480px) {
+    nav {
+        flex-direction: row;
+        padding: 5px 10px;
+    }
+
+    .navlogo {
+        width: 100px; 
+    }
+
+    nav ul {
+        flex-direction: row; 
+        justify-content: center;
+    }
+
+    nav ul li a {
+        font-size: 12px; 
+    }
+
+    .card {
+        max-width: 90%; 
+    }
+}
+
+}
+
+
+.artikel1{
+    color: black;
+    justify-content: center;
+    text-align: center;
+    font-weight: bold;
+    font-size: 25px;
+    font-weight: 100vh;
+    font-family: 'Times New Roman', Times, serif;
+}
+.artikel{
+    color:black;
+    justify-content: right;
+    font-size: 25px;
+    font-family: 'Times New Roman', Times, serif;
+
+}
+
+.artikel article {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.artikel2{
+    font-size: 40px;
+}
+
+.navlogo{
+    height: 110px;
+    width: 200px;
+    
+}
+
+.contact-wa {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 300px;
+    height: 300px;
+}
+
+.contact-wa:hover {
+    transform: translate(-50%, -50%) scale(1.1); 
+    border-radius: 50%; 
+}
+

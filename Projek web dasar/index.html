@@ -12,19 +12,25 @@
     <!--tailwind-->
      <script src="https://cdn.tailwindcss.com"></script>
     <!--tailwind end-->
+
+    <!-- AOS Library CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!--end AOS Library CSS-->
+
     <title>Alat Kebersihan Sampah</title> 
     <link rel="stylesheet" href="style..css">
 </head>
 <body>
 
     <nav>
+        <img src="ecoow.png" class="navlogo" alt="logo"/>
         <div class="wrapper">
-            <div class="logo"><a href=''>TEKNIK INFORMATIKA R7</a></div>
             <div class="menu">
                 <ul>
                     <li><a href="#home">Home</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                    <li><a href="login.html" class="tbl-biru">Sign Up</a></li>
+                    <li><a href="contact.html">Contact</a></a></li>
+                    <li><a href="login.html" class="tbl-biru">Sign In<a></li>
                 </ul>
             </div>
         </div>
@@ -41,7 +47,6 @@
                 <img src="sapuuu.png" alt="Image 1">
                 <div class="card-content">
                     <h3>Sapu</h3>
-                    <p>Alat untuk membersihkan debu,kotoran dan sampah yang terdapat pada lantai. Sapu banyak macam-macam jenisnya</p>
                     <a href="https://www.tokopedia.com/coogerindonesia/cooger-set-sapu-pengki-lipat-2in1-broom-set-lipat-pembersih?extParam=ivf%3Dtrue%26keyword%3Dsapu%26search_id%3D202412150549376E7671379E5DD00D345F%26src%3Dsearch"><button>Lihat Detail</button></a>
 
                 </div>
@@ -51,7 +56,6 @@
                 <img src="pel lantai.png" alt="Image 2">
                 <div class="card-content">
                     <h3>Pel</h3>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
                     <a href="https://www.tokopedia.com/coogerindonesia/cooger-panda-dual-clean-mop-terbaru-2in1-spin-mop-pel-otomatis?extParam=cmp%3D1%26ivf%3Dtrue%26keyword%3Dpel+lantai&src=topads"><button>Lihat Detail</button></a>
                 </div>
             </div>
@@ -59,8 +63,7 @@
             <div class="card">
                 <img src="pengki.png" alt="Image 3">
                 <div class="card-content">
-                    <h3>garbage dust</h3>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                    <h3>Pengki</h3>
                    <a href="https://www.tokopedia.com/starshop-999/3m-scotch-brite-pengki-plastik-id-44-tempat-serokan-sampah?extParam=ivf%3Dfalse%26keyword%3Dpengki+sampah&src=topads"><button>Lihat Detail</button></a>
 
                 </div>
@@ -70,7 +73,6 @@
               <img src="kemoceng.png" alt="Image 4">
               <div class="card-content">
                   <h3>kemoceng</h3>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
                   <a href="https://www.tokopedia.com/kleanerliving/kleaner-kemoceng-gagang-extend-fleksibel-duster-microfiber-serbaguna"><button>Lihat Detail</button></a>
               </div>
           </div>
@@ -79,7 +81,6 @@
               <img src="robot.png" alt="Image 3">
               <div class="card-content">
                   <h3>Robot vacuum</h3>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
                   <a href="https://tokopedia.com/inovtek/xiaomi-mi-robot-vacuum-cleaner-x20-6000pa-and-mop-smart-cleaning-garansi-resmi-x20-b3d69?extParam=ivf%3Dtrue%26keyword%3Dxiaomi+vacuum+robot%26search_id%3D20241215060233C0E471BAF6D828312KP1%26src%3Dsearch"><button>Lihat Detail</button></a>
           </div>        
               </div>
@@ -91,45 +92,55 @@
         <!--end content-->
 
         <!--contoh artikel-->
-        <header>
-            <h1>Berapa Ton Sampah yang Dihasilkan Setiap Harinya?</h1>
+        <header class="artikel1">
+            <h1 class="artikel2"><strong>Fakta Tentang Sampah</strong></h1>
         </header>
 
-        <div class="container">
-            <article>
-                <h1>Fakta Tentang Sampah</h1>
-                <p>Sampah menjadi salah satu tantangan terbesar yang dihadapi dunia saat ini. Berdasarkan data dari Bank Dunia, setiap harinya, dunia menghasilkan sekitar <strong>2,01 miliar ton sampah</strong>. Angka ini mencakup semua jenis sampah, mulai dari sampah rumah tangga, plastik, hingga limbah industri.</p>
+        <div class="artikel">
+            <article data-aos="fade-up" data-aos-duration="1000">
+                <br>
+                <h1 class="artikel"><strong>Tentang Sampah</strong></h1>
+                <p>Sampah menjadi salah satu tantangan terbesar yang dihadapi dunia saat ini Berdasarkan data dari Bank Dunia, setiap harinya, dunia menghasilkan sekitar <strong>2,01 miliar ton sampah</strong>. Angka ini mencakup semua jenis sampah, mulai dari sampah rumah tangga, plastik, hingga limbah industri.</p>
+            </article>
         
-                <h2>Sampah di Indonesia</h2>
-                <p>Indonesia sendiri menyumbang sekitar <strong>175.000 ton sampah per hari</strong>, dengan lebih dari 60% berasal dari sampah organik dan sisanya adalah sampah anorganik seperti plastik dan logam. Sayangnya, pengelolaan sampah di Indonesia masih menjadi masalah serius dengan banyaknya sampah yang berakhir di tempat pembuangan akhir (TPA) atau bahkan mencemari lingkungan.</p>
+            <article data-aos="fade-up" data-aos-duration="1000" data-aos-delay="300">
+                <h2 class="artikel"><strong>Alat kebersihan sampah sederhana</strong></h2>
+                <p>Alat-alat kebersihan sederhana seperti sapu, pengki, kemoceng , kemoceng, pel lantai, robot vacuum memiliki peran penting dalam menjaga kebersihan lingkungan sehari-hari. Meskipun terlihat sederhana, alat-alat ini efektif membantu mengelola sampah dan membersihkan berbagai area, baik di dalam rumah, halaman, maupun tempat umum. Penggunaan sapu memudahkan pembersihan kotoran dari permukaan, pengki membantu pengumpulan sampah, dan tempat sampah menjadi wadah utama untuk mengorganisir sampah sebelum dibuang atau didaur ulang. Alat tambahan seperti lap pel dan tongkat pemungut sampah juga mempermudah penanganan noda serta sampah yang sulit dijangkau. Dengan menggunakan alat kebersihan sederhana, kita dapat menciptakan lingkungan yang bersih dan sehat, meminimalkan risiko penyakit akibat lingkungan kotor, serta membentuk kebiasaan hidup bersih yang lebih sadar akan pentingnya kebersihan. Alat-alat ini juga ramah lingkungan, terutama jenis yang berbahan alami seperti sapu lidi dan sapu ijuk. Menjaga kebersihan tidak selalu memerlukan teknologi mahal atau peralatan canggih; cukup dengan memanfaatkan alat sederhana ini secara rutin, kita dapat menciptakan lingkungan yang nyaman, asri, dan layak huni, sekaligus berkontribusi untuk keberlangsungan hidup yang lebih baik di masa depan.</p>
+            </article>
         
-                <h2>Dampak Sampah</h2>
-                <p>Sampah yang tidak dikelola dengan baik dapat menyebabkan berbagai dampak negatif, seperti pencemaran lingkungan, gangguan kesehatan, dan kontribusi terhadap perubahan iklim akibat emisi gas metana dari TPA.</p>
+            <article data-aos="fade-up" data-aos-duration="1000" data-aos-delay="600">
+                <h2 class="artikel"><strong>Dampak Sampah</strong></h2>
+                <p>Sampah yang tidak dikelola dengan baik dapat menyebabkan berbagai dampak negatif , seperti pencemaran lingkungan, gangguan kesehatan, dan kontribusi terhadap perubahan iklim akibat emisi gas metana dari TPA.</p>
+            </article>
         
-                <h2>Solusi untuk Mengurangi Sampah</h2>
+            <article data-aos="fade-up" data-aos-duration="1000" data-aos-delay="900">
+                <h2 class="artikel"><strong>Solusi untuk Mengurangi Sampah</strong></h2>
                 <p>Untuk mengatasi masalah ini, diperlukan upaya kolektif dari pemerintah, masyarakat, dan sektor swasta. Berikut beberapa langkah yang bisa diambil:
-                    <ul>
-                        <li>Meningkatkan kesadaran masyarakat tentang pentingnya daur ulang dan pengelolaan sampah.</li>
-                        <li>Menerapkan sistem pemilahan sampah sejak dari rumah tangga.</li>
-                        <li>Mengurangi penggunaan plastik sekali pakai.</li>
-                        <li>Memanfaatkan teknologi untuk pengelolaan sampah yang lebih efisien.</li>
-                    </ul>
-                </p>
+
+                <ul>
+                    <li>1. Meningkatkan kesadaran masyarakat tentang pentingnya daur ulang dan pengelolaan sampah.</li>
+                    <li>2. Menerapkan sistem pemilahan sampah sejak dari rumah tangga.</li>
+                    <li>3. Mengurangi penggunaan plastik sekali pakai.</li>
+                    <li>4. Memanfaatkan teknologi untuk pengelolaan sampah yang lebih efisien.</li>
+                </ul>
+            </p>
+
             </article>
         </div>
+        
         <!--end contoh artikel-->
 
         <!--contoh gambar slide gerak-->
 <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
       <div class="carousel-item active">
-        <img src="p4.png" class="d-block w-100" alt="...">
+        <img src="p4.png" class="d-block w-50" style="margin-left: 320px;" alt="...">
       </div>
       <div class="carousel-item">
-        <img src="p5.png" class="d-block w-100" alt="...">
+        <img src="p5.png" class="d-block w-50"  style="margin-left: 320px;" alt="...">
       </div>
       <div class="carousel-item">
-        <img src="p6.png" class="d-block w-100" alt="...">
+        <img src="p6.png" class="d-block w-50"  style="margin-left: 320px;" alt="...">
       </div>
     </div>
     <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying" data-bs-slide="prev">
@@ -150,28 +161,27 @@
         <div class="wrapper">
             <div class="footer">
                 <div class="footer-section">
-                    <h3>R7</h3>
-                    <p>Jangan Cari Yang Gaada</p>
+                    <h3>Tentang Kami</h3>
                 </div>
                 <div class="footer-section">
-                    <h3>About</h3>
-                    <p>Dalam tahap pengembangan</p>
+                    <h3>Produk & Layanan</h3>
                 </div>
                 <div class="footer-section">
-                    <h3>Contact</h3>
-                    <p>-</p>
+                <a href="contact.html" ><h3>Contact</h3></a>
                 </div>
                 <div class="footer-section">
-                    <h3>Sosial</h3>
-                    <p>@informatika.r7</p>
+                   <a href="https://www.instagram.com/informatika.r7/"><h3>Sosial</h3>
+                </div>
+                <div class="footer-section">
+                    <h3>Support</h3>
                 </div>
             </div>
         </div>
     </div>
-
     <div id="copyright">
         <div class="wrapper">
             &copy; 2024. <b>Kelompok 3 R7</b> All Rights Reseved.
+    <p> <strong> Website Sedang Dalam Tahap Pengembangan</strong></p>
         </div>
     </div>
          <!--footeres-->
@@ -180,5 +190,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <!--bootsrap end-->
+
+    <!-- AOS Library JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+    AOS.init(); // Inisialisasi AOS
+    </script>
+    <!--end AOS Library JS-->
+
 </body>
 </html>
