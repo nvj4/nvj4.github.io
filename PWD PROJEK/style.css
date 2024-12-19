@@ -1,0 +1,279 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #F5EBDD;
+    color: #333;
+}
+
+/* Navigation Bar */
+header {
+ position: fixed;
+ width: 100%;
+ top:0;
+ right: 0;
+ z-index: 1000;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ background: white;
+ box-shadow: 0 4px 41px rgb(14 55 54 / 14%);
+ padding: 15px 10%;
+ transition: 0.2s;
+}
+
+.logo img {
+    width: 120px;
+}
+
+nav ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    
+    
+}
+
+nav ul.active {
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+nav ul li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+    transition: color 0.3s;
+}
+nav ul li a:hover {
+    color: #006241;
+}
+.menu-icon {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 5px;
+}
+.menu-icon div {
+    width: 25px;
+    height: 3px;
+    background-color:#333;
+
+}
+@media (max-width: 768px) {
+    .menu-icon {
+        display: flex;
+    }
+    nav ul {
+        flex-direction: column;
+        align-items: flex-start;
+        display: none;
+        background-color: #333;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        padding: 10px 0;
+        max-width: 476px;
+    }
+    nav ul.active {
+        display: flex;
+        max-width: 476px;
+    }
+    nav ul li {
+        margin: 10px 0;
+    }
+}
+
+.heading{
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.heading span{
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--second-color--)
+}
+
+.heading h1{
+    font-size: 36px;
+    color: #006241;
+}
+/* Hero Section */
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 50px 10%;
+}
+
+.text {
+    max-width: 400px;
+}
+
+.text h3 {
+    font-size: 18px;
+    color: #444;
+    margin-bottom: 10px;
+}
+
+.text h1 span {
+    color: #006241; /* Starbucks Green */
+    font-size: 36px;
+    font-weight: bold;
+}
+
+.text p {
+    font-size: 16px;
+    margin: 10px 0 20px;
+}
+
+button {
+    background: transparent;
+    border: 2px solid #333;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button:hover {
+    background-color: #006241;
+    color: white;
+    border-color: #006241;
+}
+
+/* Drinks Images */
+.images {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.images img {
+    width: 500px;
+    height: auto;
+    transition: transform 0.3s ease;
+}
+
+.images img:hover {
+    transform: scale(1.05);
+}
+
+
+/* Card Section */
+.card-section {
+    padding: 50px;
+    background: #f0f0f0;
+    text-align: center;
+}
+
+.card-section .container {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 250px;
+    transition: transform 0.3s ease;
+}
+
+.card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.card p {
+    font-size: 1rem;
+    color: #555;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+.article {
+    padding: 60px 40px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    margin: 40px auto;
+    max-width: 800px;
+}
+.article h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color:#006241 ;
+    text-align: center;
+}
+.article p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    text-align: justify;
+    color: #4b5563;
+}
+.article p strong {
+    color: #16a34a;
+}
+.article p:first-letter {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #d97706;
+}
+
+footer {
+    background-color: #89A8B2;
+    color: #ffffff;
+    padding: 40px 20px;
+    text-align: center;
+    margin-top: 40px;
+}
+footer .social-icons {
+    margin: 20px 0;
+}
+footer .social-icons a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 1.5rem;
+}
+footer .social-icons a:hover {
+    color: #d1d5db;
+}
+footer p {
+    font-size: 1rem;
+    margin: 10px 0;
+}
+
+/* bagian contact */
+
+.contact-whatsapp {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    margin-top: 200px;
+}
+.contact-whatsapp img {
+    width: 100px;
+    height: auto;
+}
