@@ -7,24 +7,24 @@
 }
 
 body {
-    background-color: #F5EBDD;
+    background-color: #f5ebdd;
     color: #333;
 }
 
 /* Navigation Bar */
 header {
- position: fixed;
- width: 100%;
- top:0;
- right: 0;
- z-index: 1000;
- display: flex;
- align-items: center;
- justify-content: space-between;
- background: white;
- box-shadow: 0 4px 41px rgb(14 55 54 / 14%);
- padding: 15px 10%;
- transition: 0.2s;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    right: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    box-shadow: 0 4px 41px rgb(14 55 54 / 14%);
+    padding: 15px 10%;
+    transition: 0.2s;
 }
 
 .logo img {
@@ -32,14 +32,12 @@ header {
 }
 
 nav ul {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-    
-    
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 nav ul.active {
@@ -59,8 +57,6 @@ nav ul li a:hover {
     color: #006241;
 }
 
-
-
 .menu-icon {
     display: none;
     flex-direction: column;
@@ -70,49 +66,63 @@ nav ul li a:hover {
 .menu-icon div {
     width: 25px;
     height: 3px;
-    background-color:#333;
-    
-
+    background-color: #333;
 }
 
-@media screen and (max-width: 476px) {
+@media screen and (max-width: 540px) {
     .menu-icon {
         display: flex;
+        cursor: pointer;
+        padding: 10px;
+        font-size: 24px;
     }
-    nav ul {
+    .nav {
+        display: none;
         flex-direction: column;
         align-items: center;
-        display: none;
         background-color: #fff;
         position: absolute;
-        top: 60px;
+        top: 86px;
         left: 0;
         width: 100%;
         padding: 10px 0;
-    
+        list-style: none;
+        margin: 0;
     }
-    nav ul.active {
+    .nav.active {
         display: flex;
-
-    
     }
-    nav ul li {
+    .nav li {
         margin: 10px 0;
     }
 }
 
-.heading{
+/* Untuk layar dengan lebar maksimum 340px */
+@media screen and (max-width: 340px) {
+    .menu-icon {
+        font-size: 20px;
+        padding: 8px;
+    }
+    .nav {
+        top: 70px;
+    }
+    .nav li {
+        margin: 8px 0;
+    }
+}
+
+.heading {
     text-align: center;
     text-transform: uppercase;
 }
 
-.heading span{
+.heading span {
     font-size: 1rem;
     font-weight: 600;
-    color: var(--second-color--)
+    color: var(--second-color--);
 }
 
-.heading h1{
+.heading h1 {
     font-size: 36px;
     color: #006241;
 }
@@ -121,7 +131,7 @@ nav ul li a:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 50px 10%;
+    padding-top: 60px;
 }
 
 .text {
@@ -177,7 +187,6 @@ button:hover {
     transform: scale(1.05);
 }
 
-
 /* Card Section */
 .card-section {
     padding: 50px;
@@ -228,7 +237,7 @@ button:hover {
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 30px;
-    color:#006241 ;
+    color: #006241;
     text-align: center;
 }
 .article p {
@@ -247,7 +256,7 @@ button:hover {
 }
 
 footer {
-    background-color: #89A8B2;
+    background-color: #89a8b2;
     color: #ffffff;
     padding: 40px 20px;
     text-align: center;
