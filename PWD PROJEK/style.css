@@ -58,6 +58,9 @@ nav ul li a {
 nav ul li a:hover {
     color: #006241;
 }
+
+
+
 .menu-icon {
     display: none;
     flex-direction: column;
@@ -68,27 +71,30 @@ nav ul li a:hover {
     width: 25px;
     height: 3px;
     background-color:#333;
+    
 
 }
-@media (max-width: 768px) {
+
+@media screen and (max-width: 476px) {
     .menu-icon {
         display: flex;
     }
     nav ul {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
         display: none;
-        background-color: #333;
+        background-color: #fff;
         position: absolute;
         top: 60px;
         left: 0;
         width: 100%;
         padding: 10px 0;
-        max-width: 476px;
+    
     }
     nav ul.active {
         display: flex;
-        max-width: 476px;
+
+    
     }
     nav ul li {
         margin: 10px 0;
