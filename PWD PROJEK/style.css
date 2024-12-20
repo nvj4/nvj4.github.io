@@ -25,10 +25,13 @@ header {
     box-shadow: 0 4px 41px rgb(14 55 54 / 14%);
     padding: 15px 10%;
     transition: 0.2s;
+    font-weight: bolder;
 }
 
 .logo img {
     width: 120px;
+    
+
 }
 
 nav ul {
@@ -54,6 +57,9 @@ nav ul li a {
     transition: color 0.3s;
 }
 nav ul li a:hover {
+    font-family: "Source Sans 3", serif;
+  font-size: 500;
+  font-weight:bolder;
     color: #006241;
 }
 
@@ -123,7 +129,9 @@ nav ul li a:hover {
 }
 
 .heading h1 {
-    font-size: 36px;
+    font-family: "Source Sans 3", serif;
+  font-size: 500;
+  font-weight:bolder;
     color: #006241;
 }
 /* Hero Section */
@@ -132,6 +140,7 @@ nav ul li a:hover {
     justify-content: space-between;
     align-items: center;
     padding-top: 60px;
+    margin-left: 100px;
 }
 
 .text {
@@ -146,22 +155,27 @@ nav ul li a:hover {
 
 .text h1 span {
     color: #006241; /* Starbucks Green */
-    font-size: 36px;
-    font-weight: bold;
+    font-family: "Source Sans 3", serif;
+    font-size: 500;
+    font-weight:bolder;
+    
 }
 
 .text p {
     font-size: 16px;
     margin: 10px 0 20px;
+    font-weight: bolder ;
 }
 
 button {
-    background: transparent;
+    background: rgb(242, 238, 238);
     border: 2px solid #333;
     padding: 10px 20px;
     border-radius: 20px;
     cursor: pointer;
     font-size: 14px;
+    font-weight:bolder;
+    color: black;
 }
 
 button:hover {
@@ -285,10 +299,13 @@ footer p {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 200px;
+    height: 200px 10px;
     margin-top: 200px;
+    margin: 70px;
+    padding: 297px;
 }
 .contact-whatsapp img {
     width: 100px;
     height: auto;
+    
 }
