@@ -3,6 +3,7 @@ body {
     background-color: #f4f4f9;
     margin: 0;
     padding: 0;
+    
 }
 
 header {
@@ -71,6 +72,7 @@ nav ul li a:hover {
         left: 0;
         right: 0;
         padding: 10px;
+        width: 500px;
     }
 
     nav ul.active {
@@ -86,6 +88,8 @@ nav ul li a:hover {
         cursor: pointer;
         gap: 5px;
     }
+
+
 
     .hero {
         flex-direction: column;
