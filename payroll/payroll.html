@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payroll</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+ <!--navbar-->
+ <header>
+    <nav>
+     <h1 class="judul">Payroll System</h1>
+    <div class="menu-icon" id="menu-icon">☰</div>
+        <ul class="nav" id="nav-links">
+            <li><a href="index.html">HOME</a></li>
+            <li><a href="payroll.html">PAYROLL</a></li>
+            <li><a href="#">ABOUT</a></li>
+        </ul>
+    </nav>
+</header>
+<!--end navbar-->
+
+
+    <div class="container">
+        <h1>Payroll System</h1>
+        <form id="payrollForm">
+            <label for="employeeName">Nama Karyawan:</label>
+            <input type="text" id="employeeName" name="employeeName" required>
+
+            <label for="workingDays">Berapa Hari Kerja:</label>
+            <input type="number" id="workingDays" name="workingDays" required>
+
+            <label for="leaveDays">Berapa Hari Cuti:</label>
+            <input type="number" id="leaveDays" name="leaveDays" required>
+
+            <label for="dailyWage">Gaji Per hari:</label>
+            <input type="number" id="dailyWage" name="dailyWage" required>
+
+            <button type="button" onclick="calculatePayroll()">Calculate</button>
+        </form>
+
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        function calculatePayroll() {
+            const employeeName = document.getElementById('employeeName').value;
+            const workingDays = parseInt(document.getElementById('workingDays').value);
+            const leaveDays = parseInt(document.getElementById('leaveDays').value);
+            const dailyWage = parseFloat(document.getElementById('dailyWage').value);
+
+            if (!employeeName || isNaN(workingDays) || isNaN(leaveDays) || isNaN(dailyWage)) {
+                alert('Please fill in all fields with valid data.');
+                return;
+            }
+
+            const actualWorkingDays = workingDays - leaveDays;
+            const totalPay = actualWorkingDays * dailyWage;
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `Nama Karyawan: ${employeeName}<br>Total Hari Kerja: ${actualWorkingDays}<br>Total Gaji: ${totalPay}`;
+        }
+    </script>
+
+    <footer>
+        <p><strong>&copy; Created By Sutan Navajo</p></strong>
+    </footer>
+</body>
+</html>

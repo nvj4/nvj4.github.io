@@ -1,0 +1,193 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: white;
+    padding: 20px 0;
+    text-align: center;
+    color: #006241;
+}
+
+header h1 {
+    margin: 0;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 1300px;
+}
+
+nav ul.active {
+    display: flex;
+}
+
+nav ul li {
+    margin-left: 20px;
+}
+nav ul li a {
+    text-decoration: none;
+    color: #006241;
+    font-size: 1rem;
+    transition: color 0.3s;
+}
+nav ul li a:hover {
+    font-family: "Source Sans 3", serif;
+  font-size: 500;
+  font-weight:bolder;
+    color: black;
+}
+
+.menu-icon {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 5px;
+}
+.menu-icon div {
+    width: 25px;
+    height: 3px;
+    background-color: #333;
+}
+
+
+.judul{
+    flex-direction: row;
+    width: 200px;
+    font-size: 20px;
+}
+
+
+main {
+    padding: 20px;
+    text-align: center;
+}
+
+
+
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 60px;
+    margin-left: 100px;
+}
+
+.text {
+    max-width: 400px;
+}
+
+.text h3 {
+    font-size: 18px;
+    color: #444;
+    margin-bottom: 10px;
+}
+
+.text h1 span {
+    color: #006241; /* Starbucks Green */
+    font-family: "Source Sans 3", serif;
+    font-size: 500;
+    font-weight:bolder;
+    
+}
+
+.text p {
+    font-size: 16px;
+    margin: 10px 0 20px;
+    font-weight: bolder ;
+}
+
+.images {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.images img {
+    width: 350px;
+    height: auto;
+    transition: transform 0.3s ease;
+}
+
+.images img:hover {
+    transform: scale(1.05);
+}
+
+table th {
+    background-color: #007bff;
+    color: white;
+}
+
+
+.container {
+    max-width: 600px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input {
+    margin-bottom: 15px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.result {
+    margin-top: 20px;
+    padding: 15px;
+    background: #e9f5e9;
+    border: 1px solid #c3e6c3;
+    border-radius: 5px;
+    color: #155724;
+}
+
+footer {
+    background-color:white;
+    color: #006241;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0px;
+}
