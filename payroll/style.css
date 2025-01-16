@@ -109,6 +109,32 @@ nav ul li a:hover {
 
 
 
+@media (max-width: 768px) {
+    .hero {
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        flex-direction: column;
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .text, .images {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .images img {
+        margin-top: 15px;
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+
+
+
+
 .judul{
     flex-direction: row;
     width: 200px;
