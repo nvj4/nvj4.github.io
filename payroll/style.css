@@ -82,6 +82,9 @@ nav ul li a:hover {
         position: absolute;
         top: 15px;
         right: 20px;
+        flex-direction: column;
+        cursor: pointer;
+        gap: 5px;
     }
 
     .hero {
