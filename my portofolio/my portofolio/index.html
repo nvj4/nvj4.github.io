@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <!-- AOS Library CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    
+    <!--end AOS Library CSS-->
+    <title>Portofolio</title>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <p>My portfolio</p>
+            </div>
+            <nav class="nav">
+                <a href="#about-me-section"><p>About Me</p></a>
+                <a id="contact-link"><p>Contact</p></a>
+            </nav>
+        </div>
+    </header>
+            
+
+        <!-- Social Media Menu -->
+    <div class="social-menu" id="social-menu">
+        <a href="https://www.instagram.com/sutanvj/" target="_blank" title="Instagram"><ion-icon name="logo-instagram"></ion-icon></a>
+        <a href="https://www.linkedin.com" target="_blank" title="LinkedIn"><ion-icon name="logo-linkedin"></ion-icon></a>
+        <a href="https://wa.me/qr/4KPNWA24QOT3D1" target="_blank" title="WhatsApp"><ion-icon name="logo-whatsapp"></ion-icon></a>
+        <a href="mailto:example@gmail.com" target="_blank" title="Gmail"><ion-icon name="mail-outline"></ion-icon></a>
+        <a href="https://github.com/nvj4/nvj4.github.io" target="_blank" title="GitHub"><ion-icon name="logo-github"></ion-icon></a>
+    </div>          
+            
+                
+         
+    
+
+    <main>
+        <div class="hero">
+        <h1>FRONTEND</h1><h1 class="hero1">DEVELOPER</h1>
+        </div>
+
+        <div class="garis">
+        <h1>________</h1>
+        </div>
+        
+        <div class="nm">
+        <p><strong>Sutan Navajo Aufa Muzakki</strong></p>
+        </div>
+    </div>
+    </main>
+
+    <main>
+        <section id="about-me-section">
+        <div class="about-container">
+            <img src="tan.png" class="poto" alt="Sutan Navajo">
+        <div class="about-text">
+            <h1 class="about">ABOUT ME</h1>
+            <p>Hi, I’m Sutan Navajo Aufa Muzakki, a passionate Frontend Developer with a strong focus on creating engaging and user-friendly web interfaces. I have a keen eye for detail and a dedication to delivering high-quality work, which helps me transform complex ideas into clean, efficient, and visually appealing digital experiences. Skilled in HTML, CSS, and JavaScript, I also utilize tools such as Tailwind CSS, Bootstrap, Git, and Figma to ensure every project is both functional and visually stunning.
+               I believe great design is not just about aesthetics but also about usability and functionality. My goal is to bridge the gap between design and development, ensuring seamless user experiences that stand out. If you’re looking for a developer who’s committed to bringing your ideas to life with creativity and precision, feel free to connect with me!</p>
+
+           <a href="https://drive.google.com/file/d/1cubzt7fyLwCzeDbsy2MVEAnzmuFYTaSe/view?usp=sharing"><button class="tombol">Download CV</button></a>   <a href="https://github.com/nvj4/nvj4.github.io"><button class="tombol">Show Project</button></a>
+        </div>    
+        </div>
+    </section>
+    </main>
+
+    <main>
+        <!-- Main Section -->
+    <section class="section-container">
+        <div class="main-card" onclick="toggleDetails('project-details')" data-aos="fade-up" data-aos-delay="200">
+            <h3>Projects</h3>
+        </div>
+        <div class="main-card" onclick="toggleDetails('certificate-details')" data-aos="fade-up" data-aos-delay="300">
+            <h3>Certificates</h3>
+        </div>
+        <div class="main-card" onclick="toggleDetails('experience-details')" data-aos="fade-up" data-aos-delay="400">
+            <h3>Experiences</h3>
+        </div>
+    </section>
+
+    <!-- Project Details -->
+    <section id="project-details" class="details-section">
+        <div class="detail-card">
+            <h4>Project 1</h4>
+            <p>Membuat Website tentang alat pemilah sampah organik maupun plastik</p><a href="https://nvj4.github.io/PWD%20PROJEK/index.html"><button class="tombol1">Lihat Detail</button></a>
+        </div>
+        <div class="detail-card">
+            <h4>Project 2</h4>
+            <p>Membuat Website Payroll System</p><a href="https://nvj4.github.io/payroll/index.html"><button class="tombol1">Lihat Detail</button></a>
+        </div>
+    </section>
+
+    <!-- Certificate Details -->
+    <section id="certificate-details" class="details-section">
+        <div class="detail-card">
+            <h4>Certificate 1</h4>
+           <p>Certificate Volunteer DFUTURO FUTURIST SUMMIT</p><a href="https://drive.google.com/file/d/1z4Saie69cYjzIH641x_p0rcWpohI2m_g/view?usp=sharing"><button class="tombol1">Lihat Detail</button></a>
+        </div>
+         <div class="detail-card">
+            <h4>Certificate 2</h4>
+            <p>Certificate LK2 Business Law Workshop</p><a href="https://drive.google.com/file/d/13bSbE-c6WTJejvosHDZFUCkOb6bcoK-w/view?usp=sharing"><button class="tombol1">Lihat Detail</button></a>
+        </div>
+        <div class="detail-card">
+            <h4>Certificate 3</h4>
+            <p>Certificate Workshop Pelatihan Pembuatan Website Mahasiswa Unindra bersama IdCloudHost</p><a href="https://drive.google.com/file/d/1k5dc5ZABVk4dgafCZJGvknNbf5EZul8s/view?usp=sharing"><button class="tombol1">Lihat Detail</button></a>
+        </div>
+        <div class="detail-card">
+            <h4>Certificate 4</h4>
+            <p>Sertifikat Bootcamp Edspert.id Web Development</p><a href="https://drive.google.com/file/d/1MCoebMQZTVhkiwhyIjtXHvjQTlJSNLzT/view?usp=sharing"><button class="tombol1">Lihat Detail</button></a>
+        </div>
+        <div class="detail-card">
+            <h4>Certificate 5</h4>
+            <p>Sertifikat Bootcamp Edspert.id Belajar IOT</p><a href="https://drive.google.com/file/d/1tK3Br0vneAVazrUHGdB91QqM6NxIhhAr/view?usp=sharing"><button class="tombol1">Lihat Detail</button></a>
+        </div>
+        <div class="detail-card">
+            <h4>Certificate 6</h4>
+            <p>Sertifikat Bootcamp Edspert.id Microsoft Exel</p><a href="https://drive.google.com/file/d/14F0XOF7JpiYZ_lRt-Y0mWP8LYQrpDRU4/view?usp=sharing"><button class="tombol1">Lihat Detail</button></a>
+        </div>
+    </section>
+
+    <!-- Experience Details -->
+    <section id="experience-details" class="details-section">
+        <div class="detail-card">
+            <h4>Experience 1</h4>
+            <p>Bekerja di perusahaan X sebagai Frontend Developer.</p>
+        </div>
+        <div class="detail-card">
+            <h4>Experience 2</h4>
+            <p>Bekerja di perusahaan Y sebagai UI/UX Designer.</p>
+        </div>
+    </section>
+    </main>
+
+    <footer>
+        <h1>Get in Touch</h1>
+        <p>© 2025 Sutan Navajo Aufa Muzakki. All Rights Reserved.</p>
+        <p>
+            <a href="https://www.instagram.com" target="_blank">Instagram</a> |
+            <a href="https://www.linkedin.com" target="_blank">LinkedIn</a> |
+            <a href="https://github.com" target="_blank">GitHub</a>
+        </p>
+    </footer>
+    
+    
+
+    <!-- Script untuk interaksi -->
+    <script>
+        const contactLink = document.getElementById('contact-link');
+        const socialMenu = document.getElementById('social-menu');
+
+        contactLink.addEventListener('click', () => {
+            const isVisible = socialMenu.style.display === 'flex';
+            socialMenu.style.display = isVisible ? 'none' : 'flex'; // Toggle tampil/sembunyi
+        });
+
+        // Klik di luar menu untuk menutupnya
+        document.addEventListener('click', (event) => {
+            if (!socialMenu.contains(event.target) && event.target !== contactLink) {
+                socialMenu.style.display = 'none';
+            }
+        });
+    </script>
+
+    <!-- Ionicons CDN -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons/dist/ionicons/ionicons.js"></script>
+
+     <!-- AOS Library JS -->
+     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+     <script>
+     AOS.init(); // Inisialisasi AOS
+     </script>
+     <!--end AOS Library JS-->
+     <script src="script.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+     
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <title>Portfolio</title>
+    <style>
+        /* Social Media Menu Styling */
+        .social-menu {
+            display: none; /* Awalnya disembunyikan */
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            flex-direction: row; /* Ikon horizontal */
+            gap: 15px;
+            background: #333;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .social-menu a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            text-decoration: none;
+            color: #000;
+            font-size: 20px;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .social-menu a:hover {
+            transform: scale(1.2);
+            background: #ff0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <p>My portfolio</p>
+            </div>
+            <nav class="nav">
+                <a href="#about-me-section"><p>About Me</p></a>
+                <a id="contact-link"><p>Contact</p></a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Social Media Menu -->
+    <div class="social-menu" id="social-menu">
+        <a href="https://www.instagram.com" target="_blank" title="Instagram"><ion-icon name="logo-instagram"></ion-icon></a>
+        <a href="https://www.linkedin.com" target="_blank" title="LinkedIn"><ion-icon name="logo-linkedin"></ion-icon></a>
+        <a href="https://wa.me" target="_blank" title="WhatsApp"><ion-icon name="logo-whatsapp"></ion-icon></a>
+        <a href="mailto:example@gmail.com" target="_blank" title="Gmail"><ion-icon name="mail-outline"></ion-icon></a>
+        <a href="https://github.com" target="_blank" title="GitHub"><ion-icon name="logo-github"></ion-icon></a>
+    </div>
+
+    <main>
+        <section id="about-me-section">
+            <h1>About Me</h1>
+            <p>Hi, I’m Sutan Navajo Aufa Muzakki...</p>
+        </section>
+    </main>
+
+    <footer>
+        <h1>Get in Touch</h1>
+        <p>© 2025 Sutan Navajo Aufa Muzakki. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Script untuk interaksi -->
+    <script>
+        const contactLink = document.getElementById('contact-link');
+        const socialMenu = document.getElementById('social-menu');
+
+        contactLink.addEventListener('click', () => {
+            const isVisible = socialMenu.style.display === 'flex';
+            socialMenu.style.display = isVisible ? 'none' : 'flex'; // Toggle tampil/sembunyi
+        });
+
+        // Klik di luar menu untuk menutupnya
+        document.addEventListener('click', (event) => {
+            if (!socialMenu.contains(event.target) && event.target !== contactLink) {
+                socialMenu.style.display = 'none';
+            }
+        });
+    </script>
+
+    <!-- Ionicons CDN -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/ionicons/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/ionicons/dist/ionicons/ionicons.js"></script>
+</body>
+</html>
