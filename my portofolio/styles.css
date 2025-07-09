@@ -1,0 +1,574 @@
+ /* Base Variables */
+        :root {
+            --primary-color: #3498db; /* A vibrant blue */
+            --secondary-color: #2c3e50; /* Darker blue/grey for text and main headings */
+            --accent-color: #e74c3c; /* Red for emphasis, links */
+            --light-bg: #f4f7f6; /* Light background */
+            --card-bg: #ffffff; /* Card background */
+            --text-color: #333;
+            --light-text-color: #7f8c8d; /* Lighter text for details */
+            --border-color: #e0e0e0;
+            --hero-bg: #2c3e50; /* Hero section background from your design */
+            --hover-blue: #EBF5FB; /* Light blue for card hover */
+        }
+
+        /* Universal Box-Sizing */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        /* Body & Typography Defaults */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            overflow-x: hidden; /* Prevent horizontal scrollbar */
+            /* scroll-behavior: smooth; -- Smooth scrolling will be less relevant without nav/scroll to top */
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'League Spartan', sans-serif;
+            color: var(--secondary-color);
+            margin-bottom: 0.5em;
+        }
+
+        h1 { font-size: 2.8em; }
+        h2 { font-size: 2.2em; }
+        h3 { font-size: 1.6em; }
+        h4 { font-size: 1.2em; }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:hover {
+            color: var(--accent-color);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            margin-bottom: 0.5em;
+            padding-left: 1.2em;
+            position: relative;
+        }
+
+        ul li::before {
+            content: '\f00c'; /* FontAwesome checkmark icon */
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+            top: 0.1em;
+            font-size: 0.9em;
+        }
+
+        /* No Header/Navbar styles needed */
+
+        /* Social Media Menu (Popup) - Still present in HTML but not used by any link */
+        .social-menu-popup {
+            display: none; /* Always hidden unless manually opened */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.98);
+            border-radius: 10px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+            padding: 2em;
+            z-index: 1001;
+            gap: 1em;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            min-width: 250px;
+            flex-direction: column;
+        }
+
+        .social-menu-popup a {
+            font-size: 2.5em;
+            color: var(--primary-color);
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .social-menu-popup a:hover {
+            color: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4em 1.5em;
+            background-color: var(--hero-bg);
+            color: #fff;
+            gap: 3em;
+            flex-wrap: wrap-reverse;
+            text-align: center;
+            min-height: 100vh; /* Make hero section fill viewport height initially */
+        }
+
+        .hero-left {
+            text-align: center;
+            flex: 1;
+            min-width: 300px;
+            max-width: 600px;
+        }
+
+        .hero-left h1 {
+            font-size: 4em;
+            line-height: 0.9;
+            margin: 0;
+            color: #fff; /* Dipastikan semua h1 di hero-left berwarna putih */
+            font-weight: 900;
+        }
+
+        .hero-left .hero1 {
+            color: var(--primary-color); /* Warna biru untuk DEVELOPER */
+            margin-top: 0.1em;
+        }
+
+        /* Typing Animation Specific Styles */
+        .hero-left .typewriter {
+            display: inline-block; /* Essential for caret animation */
+            overflow: hidden; /* Ensures text appears to type */
+            white-space: nowrap; /* Keeps text on one line */
+            border-right: .15em solid var(--primary-color); /* The typing cursor */
+            box-sizing: border-box; /* Include padding/border in element's total width */
+            color: #fff; /* Warna teks typing menjadi putih */
+            font-weight: 900;
+            /* Width akan diatur oleh JS */
+            vertical-align: top; /* Align with the top of the line */
+        }
+
+        /* Keyframes for blinking caret (always present) */
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: var(--primary-color); }
+        }
+
+
+        .hero-left .garis h1 {
+            color: var(--accent-color);
+            font-size: 3em;
+            margin: 0 auto;
+            font-weight: 300;
+            overflow: hidden;
+            width: fit-content;
+        }
+
+        .hero-left .nm p {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5em;
+            margin-top: 1em;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .hero-right {
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+        }
+
+        .hero-right img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            object-fit: cover;
+        }
+
+        /* Social Links directly under name */
+        .hero .social-links {
+            margin-top: 1.5em;
+            display: flex;
+            justify-content: center;
+            gap: 1em;
+            flex-wrap: wrap;
+        }
+        .hero .social-links a {
+            color: #fff;
+            font-size: 2em;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .hero .social-links a:hover {
+            color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+        
+        /* About Me Section */
+        #about-me-section {
+            background-color: var(--card-bg);
+            padding: 4em 2em;
+            margin: 2em auto; /* Adjusted margin */
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            max-width: 1200px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2em;
+            text-align: center;
+        }
+
+        .about-container .poto {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid var(--primary-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .about-text {
+            max-width: 800px;
+        }
+
+        .about-text .about {
+            text-align: center;
+            margin-bottom: 1em;
+            font-size: 2.2em;
+            position: relative;
+            padding-bottom: 0.5em;
+        }
+        .about-text .about::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .about-text p {
+            font-size: 1.1em;
+            margin-bottom: 1.5em;
+            color: var(--text-color);
+        }
+
+        .tombol {
+            display: inline-block;
+            padding: 0.8em 1.5em;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin: 0.5em;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        .tombol:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .tombol1 { /* For detail cards links */
+            display: inline-block;
+            padding: 0.5em 1em;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: auto;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+        }
+        .tombol1:hover {
+            background-color: #2980b9;
+        }
+
+        /* Skills Section */
+        #skills {
+            background-color: var(--light-bg);
+            padding: 4em 2em;
+            max-width: 1200px;
+            margin: 2em auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .section-title {
+            margin-bottom: 2em;
+            position: relative;
+            padding-bottom: 0.5em;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1em;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .skills-grid span {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 0.8em 1.5em;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            white-space: nowrap;
+        }
+
+        .skills-grid span:hover {
+            transform: translateY(-3px);
+            background-color: #2980b9;
+        }
+
+        /* Main Section Cards for Toggling */
+        .main-section-cards-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5em;
+            max-width: 1200px;
+            margin: 3em auto 2em;
+            padding: 0 1.5em;
+        }
+
+        .main-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 2em;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+
+        .main-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            background-color: var(--hover-blue);
+        }
+        
+        .main-card.active-main-card {
+            background-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+        }
+        .main-card.active-main-card h3 {
+            color: #fff;
+        }
+
+        .main-card h3 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 1.8em;
+            transition: color 0.3s ease;
+        }
+
+        /* Detail Sections (Hidden by default) */
+        .details-section {
+            display: none;
+            max-width: 1200px;
+            margin: 2em auto;
+            padding: 2em;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5em;
+        }
+        .details-section.active {
+            display: grid;
+        }
+
+        .detail-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5em;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: box-shadow 0.3s ease, background-color 0.3s ease;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            cursor: default;
+        }
+
+        .detail-card:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            background-color: var(--hover-blue);
+        }
+
+        .detail-card h4 {
+            margin-top: 0;
+            color: var(--secondary-color);
+            font-size: 1.3em;
+            margin-bottom: 0.5em;
+        }
+
+        .detail-card p {
+            font-size: 0.95em;
+            margin-bottom: 0.8em;
+            color: var(--light-text-color);
+            flex-grow: 1;
+        }
+
+        .company-name, .issuer {
+            font-weight: 500;
+            color: var(--primary-color);
+            margin-bottom: 0.2em;
+        }
+
+        .period, .date {
+            font-style: italic;
+            color: var(--light-text-color);
+            font-size: 0.9em;
+            margin-bottom: 0.8em;
+        }
+        
+        /* No Footer styles needed */
+        /* No Scroll to Top Button styles needed */
+
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            .about-container {
+                flex-direction: row;
+                text-align: left;
+            }
+            .about-container .poto {
+                margin-right: 2em;
+            }
+            .about-text .about {
+                text-align: left;
+            }
+            .about-text .about::after {
+                left: 0;
+                transform: translateX(0);
+            }
+            .hero-left {
+                text-align: right;
+            }
+            .hero-left .garis h1 {
+                margin-left: auto;
+                margin-right: 0;
+            }
+            .hero .social-links {
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column-reverse;
+                text-align: center;
+            }
+            .hero-left {
+                text-align: center;
+                min-width: unset;
+            }
+            .hero-left .garis h1 {
+                margin: 0 auto;
+            }
+
+            .skills-grid span {
+                font-size: 1em;
+                padding: 0.6em 1em;
+            }
+            
+            .main-section-cards-wrapper {
+                grid-template-columns: 1fr;
+                padding: 0 1.5em;
+            }
+            .details-section.active {
+                 grid-template-columns: 1fr;
+                 padding: 1.5em;
+            }
+            .main-card {
+                padding: 1.5em;
+            }
+            .main-card h3 {
+                font-size: 1.5em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.8em; }
+            h3 { font-size: 1.4em; }
+            
+            .hero-left h1 {
+                font-size: 2.8em;
+            }
+            .hero-left .garis h1 {
+                font-size: 2em;
+            }
+            .hero-left .nm p {
+                font-size: 1.2em;
+            }
+            .hero-right img {
+                max-width: 250px;
+            }
+            .poto {
+                width: 150px !important;
+                height: 150px !important;
+            }
+            .tombol {
+                font-size: 0.9em;
+                padding: 0.6em 1.2em;
+            }
+            .tombol1 {
+                font-size: 0.8em;
+                padding: 0.4em 0.8em;
+            }
+            .social-menu-popup {
+                padding: 1.5em;
+                min-width: 200px;
+            }
+            .social-menu-popup a {
+                font-size: 2em;
+            }
+            /* Adjust typing text for smaller screens */
+            .hero-left .typewriter {
+                font-size: 1em; /* Smaller font for animated text on small screens */
+            }
+        }
