@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaktaKu - Platform Deteksi Hoax</title>
+    <meta name="theme-color" content="#6366f1">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/2966/2966393.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --light: #f1f5f9;
+            --white: #ffffff;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow: 0 10px 25px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 40px rgba(0,0,0,0.15);
+            --shadow-xl: 0 25px 50px rgba(0,0,0,0.2);
+            --radius: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 30px;
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: rgba(30, 41, 59, 0.95);
+            --bg-header: rgba(15, 23, 42, 0.95);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-color: rgba(148, 163, 184, 0.1);
+            --gradient: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            --gradient-2: linear-gradient(135deg, #f472b6 0%, #fb7185 100%);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-secondary: #ffffff;
+            --bg-card: rgba(255, 255, 255, 0.95);
+            --bg-header: rgba(255, 255, 255, 0.95);
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background 0.4s, color 0.4s;
+        }
+
+        [data-theme="light"] body {
+            background: #f0f2ff;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(102,126,234,0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(118,75,162,0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(236,72,153,0.06) 0%, transparent 50%);
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+
+        .theme-toggle {
+            position: fixed; bottom: 30px; right: 30px; z-index: 1001;
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 50%; width: 58px; height: 58px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--shadow-lg); transition: all 0.3s; cursor: pointer;
+        }
+        .theme-toggle:hover { transform: scale(1.1); box-shadow: var(--shadow-xl); }
+        .theme-toggle-btn {
+            width: 100%; height: 100%; border-radius: 50%; border: none;
+            background: transparent; color: var(--text-primary); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; transition: transform 0.4s;
+        }
+        .theme-toggle-btn:hover { transform: rotate(180deg); }
+
+        header {
+            padding: 18px 0; position: sticky; top: 0; z-index: 1000;
+            background: var(--bg-header); backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-lg); transition: all 0.3s;
+            border-bottom: 1px solid var(--border-color);
+        }
+        header.scrolled { padding: 12px 0; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; gap: 30px; }
+        .brand-section { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+        .logo {
+            width: 62px; height: 62px; border-radius: var(--radius-lg);
+            object-fit: cover; background: white; padding: 6px;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.8), var(--shadow-xl);
+            transition: transform 0.3s;
+        }
+        [data-theme="dark"] .logo { box-shadow: 0 0 0 3px rgba(255,255,255,0.15), var(--shadow-xl); }
+        .logo:hover { transform: scale(1.06); }
+        .brand-text h1 {
+            font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700;
+            background: var(--gradient); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .brand-text p { font-size: 13px; color: var(--text-secondary); }
+
+        .nav-section { flex: 1; display: flex; justify-content: center; }
+        .nav-links { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+        .nav-link {
+            padding: 10px 20px; border-radius: var(--radius); color: var(--text-primary);
+            text-decoration: none; font-weight: 500; font-size: 14px;
+            transition: all 0.3s; position: relative; overflow: hidden; white-space: nowrap;
+        }
+        .nav-link::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 0; height: 100%;
+            background: var(--gradient); transition: width 0.3s; z-index: -1;
+        }
+        .nav-link:hover::before, .nav-link.active::before { width: 100%; }
+        .nav-link:hover, .nav-link.active { color: #fff; transform: translateY(-2px); }
+        .nav-link i { margin-right: 6px; }
+
+        .actions-section { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .btn {
+            padding: 11px 22px; border-radius: var(--radius); font-weight: 600; font-size: 14px;
+            border: none; cursor: pointer; transition: all 0.3s;
+            display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+        }
+        .btn-primary { background: var(--gradient); color: #fff; box-shadow: 0 4px 15px rgba(99,102,241,0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.45); }
+        .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: #fff; }
+        .btn-detail {
+            background: transparent; color: var(--primary); border: 1px solid var(--primary);
+            padding: 8px 16px; font-size: 13px; margin-top: 15px; width: 100%; justify-content: center;
+        }
+        .btn-detail:hover { background: var(--primary); color: #fff; transform: translateY(-2px); }
+
+        .user-profile {
+            display: none; align-items: center; gap: 10px;
+            padding: 8px 16px; background: rgba(99,102,241,0.1); border-radius: 50px; transition: all 0.3s;
+        }
+        [data-theme="dark"] .user-profile { background: rgba(99,102,241,0.2); }
+        .user-avatar {
+            width: 36px; height: 36px; border-radius: 50%; background: var(--gradient);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 600; font-size: 14px;
+        }
+        .user-name { font-weight: 600; color: var(--text-primary); font-size: 13px; }
+        .logout-btn {
+            padding: 6px 10px; background: rgba(239,68,68,0.1); color: var(--danger);
+            border: none; border-radius: var(--radius); cursor: pointer; font-size: 13px; transition: all 0.3s;
+        }
+        .logout-btn:hover { background: var(--danger); color: #fff; }
+        .mobile-menu-toggle { display: none; background: none; border: none; font-size: 22px; color: var(--text-primary); cursor: pointer; }
+
+        .hero {
+            margin: 35px 0; padding: 50px 40px; background: var(--bg-card);
+            border-radius: var(--radius-xl); box-shadow: var(--shadow-xl);
+            position: relative; overflow: hidden; transition: all 0.3s;
+            border: 1px solid var(--border-color);
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -40%; right: -8%;
+            width: 450px; height: 450px;
+            background: radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-content { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
+        .hero-text h2 {
+            font-family: 'Space Grotesk', sans-serif; font-size: 44px; font-weight: 700;
+            margin-bottom: 18px; background: var(--gradient);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; line-height: 1.2;
+        }
+        .hero-text p { font-size: 15px; line-height: 1.8; color: var(--text-secondary); margin-bottom: 14px; }
+        .hero-visual { display: flex; justify-content: center; }
+        .hero-card {
+            width: 320px; height: 320px; background: var(--bg-secondary);
+            border-radius: var(--radius-xl); display: flex; align-items: center;
+            justify-content: center; padding: 14px;
+            box-shadow: 0 0 0 8px rgba(255,255,255,0.8), var(--shadow-xl);
+            transform: rotate(5deg); transition: transform 0.3s; border: 1px solid var(--border-color);
+        }
+        [data-theme="dark"] .hero-card { box-shadow: 0 0 0 8px rgba(255,255,255,0.1), var(--shadow-xl); }
+        .hero-card:hover { transform: rotate(0) scale(1.05); }
+        .hero-card img { width: 230px; height: 230px; border-radius: var(--radius-lg); object-fit: cover; background: #fff; padding: 8px; }
+
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin: 35px 0; }
+        .stat-card {
+            padding: 28px; background: var(--bg-card); border-radius: var(--radius-lg);
+            text-align: center; box-shadow: var(--shadow); transition: all 0.3s;
+            position: relative; overflow: hidden; border: 1px solid var(--border-color);
+        }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--gradient); }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .stat-icon {
+            width: 56px; height: 56px; margin: 0 auto 16px; background: var(--gradient);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: 22px;
+        }
+        .stat-number { font-size: 32px; font-weight: 700; color: var(--text-primary); }
+        .stat-label { color: var(--text-secondary); font-size: 13px; margin-top: 4px; }
+
+        .features { margin: 55px 0; }
+        .section-header { text-align: center; margin-bottom: 45px; }
+        .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 34px; font-weight: 700; color: var(--text-primary); }
+        .section-subtitle { color: var(--text-secondary); font-size: 15px; margin-top: 8px; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
+        .feature-card {
+            padding: 35px 28px; background: var(--bg-card); border-radius: var(--radius-lg);
+            box-shadow: var(--shadow); transition: all 0.3s; position: relative; overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .feature-card::after { content: ''; position: absolute; top: 0; right: 0; width: 90px; height: 90px; background: var(--gradient); opacity: 0.08; border-radius: 0 0 0 100%; }
+        .feature-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-xl); }
+        .feature-icon {
+            width: 64px; height: 64px; background: var(--gradient); border-radius: var(--radius);
+            display: flex; align-items: center; justify-content: center; color: #fff; font-size: 26px; margin-bottom: 22px;
+        }
+        .feature-title { font-size: 20px; font-weight: 600; margin-bottom: 12px; color: var(--text-primary); }
+        .feature-desc { color: var(--text-secondary); line-height: 1.6; font-size: 14px; }
+
+        .news-section { margin: 55px 0; }
+        .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; }
+        .news-card {
+            background: var(--bg-card); border-radius: var(--radius-lg); overflow: hidden;
+            box-shadow: var(--shadow); transition: all 0.3s; cursor: default;
+            border: 1px solid var(--border-color); display: flex; flex-direction: column;
+        }
+        .news-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-xl); }
+        .news-image-wrapper { overflow: hidden; }
+        .news-image { width: 100%; height: 190px; object-fit: cover; transition: transform 0.4s; display: block; }
+        .news-card:hover .news-image { transform: scale(1.06); }
+        .news-content { padding: 22px; flex-grow: 1; display: flex; flex-direction: column; }
+        .news-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 12px; color: var(--text-secondary); }
+        .news-date { display: flex; align-items: center; gap: 5px; }
+        .news-source {
+            display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px;
+            background: rgba(99,102,241,0.1); border-radius: 20px; font-size: 11px;
+            color: var(--primary); font-weight: 600;
+        }
+        [data-theme="dark"] .news-source { background: rgba(99,102,241,0.2); }
+        .news-title { font-size: 17px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary); line-height: 1.4; }
+        .news-excerpt { color: var(--text-secondary); font-size: 13px; line-height: 1.6; flex-grow: 1; }
+
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            z-index: 9999; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.3s;
+        }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: var(--bg-card); border-radius: var(--radius-xl); padding: 36px;
+            max-width: 700px; width: 92%; max-height: 90vh; overflow-y: auto;
+            transform: scale(0.9) translateY(20px); transition: transform 0.35s;
+            border: 1px solid var(--border-color); box-shadow: var(--shadow-xl);
+        }
+        .modal.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+        .modal-title {
+            font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700;
+            background: var(--gradient); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .modal-close {
+            width: 38px; height: 38px; border-radius: 50%; border: none;
+            background: rgba(0,0,0,0.05); cursor: pointer; display: flex;
+            align-items: center; justify-content: center; font-size: 20px;
+            color: var(--text-secondary); transition: all 0.3s; flex-shrink: 0;
+        }
+        [data-theme="dark"] .modal-close { background: rgba(255,255,255,0.05); }
+        .modal-close:hover { background: rgba(239,68,68,0.1); transform: rotate(90deg); color: var(--danger); }
+
+        .form-group { margin-bottom: 22px; }
+        .form-label { display: block; margin-bottom: 7px; font-weight: 600; color: var(--text-primary); font-size: 14px; }
+        .form-control {
+            width: 100%; padding: 12px 16px; border: 2px solid var(--border-color);
+            border-radius: var(--radius); font-size: 15px; background: var(--bg-secondary);
+            color: var(--text-primary); transition: all 0.3s; font-family: inherit;
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+        .form-control::placeholder { color: var(--text-muted); }
+        textarea.form-control { resize: vertical; min-height: 110px; }
+        .form-actions { display: flex; gap: 12px; margin-top: 26px; }
+
+        .result-box { margin-top: 26px; padding: 20px; border-radius: var(--radius); display: none; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .result-box.visible { display: block; animation: fadeInUp 0.5s ease; }
+
+        .auth-split { display: flex; max-width: 880px; width: 95%; padding: 0; overflow: hidden; border-radius: var(--radius-xl); }
+        .auth-left, .auth-right { flex: 1; padding: 32px; }
+        .auth-left { background: #1e1e2f; color: #fff; border-radius: var(--radius-xl) 0 0 var(--radius-xl); }
+        .auth-right { background: #fff; color: #0f172a; border-radius: 0 var(--radius-xl) var(--radius-xl) 0; }
+        .auth-left h2, .auth-right h2 { margin-bottom: 22px; font-family: 'Space Grotesk', sans-serif; font-size: 22px; }
+        .auth-left .form-control { border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); color: #fff; }
+        .auth-left .form-control::placeholder { color: rgba(255,255,255,0.4); }
+        .auth-left .form-control:focus { border-color: #818cf8; box-shadow: 0 0 0 3px rgba(129,140,248,0.2); }
+        .auth-left .form-label { color: rgba(255,255,255,0.8); }
+        .auth-right .form-control { border-color: #ddd; background: #f9fafb; }
+        .auth-right .form-label { color: #374151; }
+        .auth-split .modal-close { position: absolute; top: 16px; right: 16px; z-index: 10; background: rgba(255,255,255,0.15); color: #fff; }
+        .auth-split .modal-close:hover { background: rgba(239,68,68,0.3); }
+        .auth-split { position: relative; }
+
+        .history-unregistered {
+            text-align: center; padding: 50px 30px; background: var(--bg-card);
+            border-radius: var(--radius-xl); box-shadow: var(--shadow-xl); border: 1px solid var(--border-color);
+        }
+        .history-unregistered-icon {
+            width: 100px; height: 100px; margin: 0 auto 24px;
+            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(236,72,153,0.1));
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 42px; color: var(--primary); animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+        .history-unregistered h3 {
+            font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700;
+            margin-bottom: 12px; background: var(--gradient);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .history-unregistered p { font-size: 15px; color: var(--text-secondary); margin-bottom: 25px; line-height: 1.6; }
+        .history-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 30px 0; }
+        .history-feature { padding: 18px; background: rgba(99,102,241,0.05); border-radius: var(--radius); text-align: center; transition: all 0.3s; }
+        [data-theme="dark"] .history-feature { background: rgba(99,102,241,0.1); }
+        .history-feature:hover { background: rgba(99,102,241,0.12); transform: translateY(-4px); }
+        .history-feature-icon { width: 46px; height: 46px; margin: 0 auto 12px; background: var(--gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; }
+        .history-feature-title { font-weight: 600; margin-bottom: 6px; color: var(--text-primary); font-size: 14px; }
+        .history-feature-desc { font-size: 12px; color: var(--text-secondary); }
+
+        .history-table { width: 100%; margin-top: 18px; border-collapse: collapse; }
+        .history-table th { background: var(--gradient); color: #fff; padding: 13px 15px; text-align: left; font-weight: 600; font-size: 13px; }
+        .history-table th:first-child { border-radius: 8px 0 0 0; }
+        .history-table th:last-child { border-radius: 0 8px 0 0; }
+        .history-table td { padding: 13px 15px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); font-size: 13px; }
+        .history-table tr:hover td { background: rgba(99,102,241,0.04); }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .badge-danger { background: rgba(239,68,68,0.1); color: var(--danger); }
+        .badge-success { background: rgba(16,185,129,0.1); color: var(--success); }
+        .btn-delete { padding: 6px 12px; background: rgba(239,68,68,0.1); color: var(--danger); border: none; border-radius: var(--radius); cursor: pointer; font-size: 12px; transition: all 0.3s; }
+        .btn-delete:hover { background: var(--danger); color: #fff; }
+        .empty-state { text-align: center; padding: 40px; color: var(--text-secondary); }
+
+        .welcome-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--gradient); z-index: 99999;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.5s;
+        }
+        .welcome-modal.active { opacity: 1; visibility: visible; }
+        .welcome-content { text-align: center; color: #fff; max-width: 580px; padding: 40px; animation: slideUp 0.8s ease; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .welcome-logo {
+            width: 130px; height: 130px; margin: 0 auto 28px; border-radius: var(--radius-xl);
+            box-shadow: 0 0 0 6px rgba(255,255,255,0.8), var(--shadow-xl);
+            animation: float 3s ease-in-out infinite; background: #fff; padding: 12px;
+        }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
+        .welcome-title { font-family: 'Space Grotesk', sans-serif; font-size: 38px; font-weight: 700; margin-bottom: 12px; }
+        .welcome-subtitle { font-size: 18px; margin-bottom: 25px; opacity: 0.9; }
+        .welcome-desc { font-size: 15px; line-height: 1.6; margin-bottom: 35px; opacity: 0.8; }
+        .welcome-btn {
+            padding: 14px 38px; background: #fff; color: var(--primary-dark); border: none;
+            border-radius: 50px; font-size: 17px; font-weight: 600; cursor: pointer;
+            transition: all 0.3s; box-shadow: var(--shadow-lg);
+        }
+        .welcome-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-xl); }
+
+        .loading-spinner {
+            width: 40px; height: 40px; border: 4px solid var(--border-color);
+            border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        footer {
+            background: var(--bg-card); padding: 28px 0; text-align: center;
+            margin-top: 70px; box-shadow: 0 -10px 30px rgba(0,0,0,0.08);
+            border-top: 1px solid var(--border-color); color: var(--text-secondary); font-size: 14px;
+        }
+
+        .about-section { display: none; margin: 55px 0; }
+        .about-section.active { display: block; }
+        .about-content { background: var(--bg-card); border-radius: var(--radius-xl); padding: 45px; box-shadow: var(--shadow-xl); border: 1px solid var(--border-color); }
+        .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 45px; }
+        .about-text h3 {
+            font-family: 'Space Grotesk', sans-serif; font-size: 30px; margin-bottom: 18px;
+            background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .about-text p { line-height: 1.8; color: var(--text-secondary); margin-bottom: 16px; font-size: 14px; }
+        .about-image img { width: 100%; border-radius: var(--radius-lg); box-shadow: var(--shadow); }
+        .team-section h4 { font-size: 22px; margin-bottom: 25px; color: var(--text-primary); }
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 24px; }
+        .team-member { text-align: center; padding: 25px 18px; background: rgba(99,102,241,0.05); border-radius: var(--radius-lg); transition: all 0.3s; }
+        .team-member:hover { transform: translateY(-4px); background: rgba(99,102,241,0.1); }
+        .team-avatar { width: 72px; height: 72px; margin: 0 auto 16px; background: var(--gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+        .team-name { font-weight: 600; margin-bottom: 4px; color: var(--text-primary); font-size: 14px; }
+        .team-role { color: var(--text-secondary); font-size: 13px; }
+
+        /* ===== BERITA MIRIP DENGAN LINK ===== */
+        .similar-card {
+            padding: 14px; border-radius: 10px; transition: all 0.2s; cursor: default;
+            border: 1px solid transparent;
+        }
+        .similar-card:hover { transform: translateX(4px); }
+        .similar-card.hoax-card {
+            background: rgba(239,68,68,0.04); border-color: rgba(239,68,68,0.1);
+        }
+        .similar-card.fact-card {
+            background: rgba(16,185,129,0.04); border-color: rgba(16,185,129,0.1);
+        }
+        .similar-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+        .similar-card-info { flex: 1; min-width: 0; }
+        .similar-card-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 5px; line-height: 1.4; }
+        .similar-card-meta { display: flex; align-items: center; gap: 8px; font-size: 10px; color: var(--text-muted); flex-wrap: wrap; margin-bottom: 8px; }
+        .similar-card-right { text-align: right; flex-shrink: 0; }
+        .sim-badge {
+            display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px;
+            border-radius: 20px; font-size: 10px; font-weight: 600;
+            background: rgba(99,102,241,0.1); color: var(--primary);
+        }
+        .label-badge { padding: 2px 8px; border-radius: 12px; font-size: 9px; font-weight: 700; margin-top: 5px; display: inline-block; }
+        .label-badge.hoax { background: rgba(239,68,68,0.08); color: var(--danger); border: 1px solid rgba(239,68,68,0.15); }
+        .label-badge.fact { background: rgba(16,185,129,0.08); color: var(--success); border: 1px solid rgba(16,185,129,0.15); }
+
+        .source-link-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 8px; font-size: 11px;
+            font-weight: 600; transition: all 0.2s; text-decoration: none;
+            background: rgba(99,102,241,0.08); color: var(--primary);
+            border: 1px solid rgba(99,102,241,0.15); margin-top: 4px;
+        }
+        .source-link-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-1px); }
+        .source-link-btn i { font-size: 10px; }
+
+        /* Panel sumber */
+        .sources-panel {
+            margin-bottom: 22px; padding: 20px; border-radius: 12px;
+        }
+        .sources-panel.fakta-panel {
+            background: linear-gradient(135deg, rgba(16,185,129,0.06), rgba(16,185,129,0.02));
+            border: 1px solid rgba(16,185,129,0.15);
+        }
+        .sources-panel.hoax-panel {
+            background: linear-gradient(135deg, rgba(239,68,68,0.06), rgba(239,68,68,0.02));
+            border: 1px solid rgba(239,68,68,0.15);
+        }
+        .sources-panel h4 {
+            font-size: 14px; font-weight: 700; margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .sources-panel.fakta-panel h4 { color: var(--success); }
+        .sources-panel.hoax-panel h4 { color: var(--danger); }
+        .sources-panel p { font-size: 11px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5; }
+
+        .source-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: 8px;
+            background: rgba(255,255,255,0.5); border: 1px solid var(--border-color);
+            margin-bottom: 8px; transition: all 0.2s; text-decoration: none; color: inherit;
+        }
+        [data-theme="dark"] .source-item { background: rgba(30,41,59,0.5); }
+        .source-item:hover { transform: translateX(3px); }
+        .source-item:hover .source-go { background: var(--primary); color: #fff; }
+        .source-item .source-icon {
+            width: 32px; height: 32px; border-radius: 8px;
+            background: var(--gradient); display: flex; align-items: center;
+            justify-content: center; color: #fff; font-size: 12px; flex-shrink: 0;
+        }
+        .source-item .source-info { flex: 1; min-width: 0; }
+        .source-item .source-name {
+            font-size: 12px; font-weight: 600; color: var(--text-primary);
+            margin-bottom: 2px; display: block;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .source-item .source-url-text {
+            font-size: 10px; color: var(--text-muted); display: block;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .source-item .source-go {
+            flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+            background: rgba(99,102,241,0.1); display: flex; align-items: center;
+            justify-content: center; color: var(--primary); font-size: 10px;
+            transition: all 0.2s;
+        }
+
+        @media (max-width: 1024px) { .nav-links { gap: 4px; } .nav-link { padding: 8px 14px; font-size: 13px; } }
+        @media (max-width: 768px) {
+            .header-content { flex-wrap: wrap; gap: 12px; }
+            .brand-section { order: 1; width: 100%; justify-content: center; }
+            .nav-section { order: 3; width: 100%; display: none; }
+            .nav-section.mobile-active { display: flex; margin-top: 12px; }
+            .actions-section { order: 2; width: 100%; justify-content: center; }
+            .mobile-menu-toggle { display: block; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
+            .nav-links { flex-direction: column; width: 100%; }
+            .nav-link { width: 100%; padding: 12px; text-align: center; }
+            .hero-content { grid-template-columns: 1fr; gap: 35px; text-align: center; }
+            .hero-text h2 { font-size: 32px; }
+            .hero-card { width: 260px; height: 260px; }
+            .hero-card img { width: 190px; height: 190px; }
+            .features-grid, .news-grid { grid-template-columns: 1fr; }
+            .stats { grid-template-columns: 1fr 1fr; }
+            .history-features { grid-template-columns: 1fr; }
+            .theme-toggle { bottom: 20px; right: 20px; width: 50px; height: 50px; }
+            .auth-split { flex-direction: column; }
+            .auth-left { border-radius: var(--radius-xl) var(--radius-xl) 0 0; }
+            .auth-right { border-radius: 0 0 var(--radius-xl) var(--radius-xl); }
+        }
+        @media (max-width: 480px) {
+            .brand-text h1 { font-size: 22px; }
+            .hero-text h2 { font-size: 26px; }
+            .section-title { font-size: 26px; }
+            .stats { grid-template-columns: 1fr; }
+            .hero-card { width: 220px; height: 220px; }
+            .hero-card img { width: 160px; height: 160px; }
+            .welcome-logo { width: 100px; height: 100px; }
+            .welcome-title { font-size: 28px; }
+            .modal-content { padding: 24px; }
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <button class="theme-toggle-btn" id="themeToggleBtn"><i class="fas fa-moon"></i></button>
+    </div>
+
+    <div id="welcomeModal" class="welcome-modal">
+        <div class="welcome-content">
+            <img src="https://cdn-icons-png.flaticon.com/512/2966/2966393.png" alt="FaktaKu" class="welcome-logo">
+            <h1 class="welcome-title">Selamat Datang di FaktaKu</h1>
+            <p class="welcome-subtitle">Platform Deteksi Berita Hoax Terpercaya</p>
+            <p class="welcome-desc">FaktaKu membantu Anda menganalisis teks berita untuk mendeteksi potensi misinformasi menggunakan metode Naive Bayes Classifier.</p>
+            <button class="welcome-btn" onclick="closeWelcome()">Mulai Sekarang</button>
+        </div>
+    </div>
+
+    <div id="detectionModal" class="modal">
+        <div class="modal-content" style="max-width:720px;">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-microscope" style="margin-right:8px;"></i>Deteksi Berita Hoax</h2>
+                <button class="modal-close" onclick="closeModal('detectionModal')">&times;</button>
+            </div>
+            <form id="detectionForm" onsubmit="return false;">
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-align-left" style="margin-right:6px;color:var(--primary);"></i>Teks Berita</label>
+                    <textarea class="form-control" id="newsText" rows="5" placeholder="Tempel teks berita yang ingin Anda periksa kebenarannya..."></textarea>
+                    <div style="display:flex;justify-content:space-between;margin-top:5px;">
+                        <span style="font-size:11px;color:var(--text-muted);">Minimal 20 karakter</span>
+                        <span id="charCount" style="font-size:11px;color:var(--text-muted);">0 karakter</span>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-primary" onclick="checkNews()" style="flex:2;"><i class="fas fa-search-plus"></i> Analisis dengan Naive Bayes</button>
+                    <button type="button" class="btn btn-outline" onclick="resetForm()"><i class="fas fa-redo"></i> Reset</button>
+                </div>
+                <div id="detectionResult" class="result-box"></div>
+            </form>
+        </div>
+    </div>
+
+    <div id="authModal" class="modal">
+        <div class="modal-content auth-split">
+            <button class="modal-close" onclick="closeModal('authModal')">&times;</button>
+            <div class="auth-left">
+                <h2><i class="fas fa-sign-in-alt" style="margin-right:8px;"></i>Masuk Akun</h2>
+                <form id="loginForm">
+                    <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" id="loginEmail" placeholder="email@example.com"></div>
+                    <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-control" id="loginPassword" placeholder="Masukkan password"></div>
+                    <button type="button" class="btn btn-primary" onclick="login()" style="width:100%;justify-content:center;"><i class="fas fa-sign-in-alt"></i> Masuk</button>
+                    <div id="loginResult" class="result-box"></div>
+                </form>
+            </div>
+            <div class="auth-right">
+                <h2><i class="fas fa-user-plus" style="margin-right:8px;"></i>Registrasi</h2>
+                <form id="registrationForm">
+                    <div class="form-group"><label class="form-label">Nama Lengkap</label><input type="text" class="form-control" id="regName" placeholder="Nama Anda"></div>
+                    <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-control" id="regEmail" placeholder="email@example.com"></div>
+                    <div class="form-group"><label class="form-label">Password</label><input type="password" class="form-control" id="regPassword" placeholder="Min. 6 karakter"></div>
+                    <div class="form-group"><label class="form-label">Konfirmasi Password</label><input type="password" class="form-control" id="regConfirmPassword" placeholder="Ulangi password"></div>
+                    <button type="button" class="btn btn-primary" onclick="register()" style="width:100%;justify-content:center;background:var(--success);box-shadow:0 4px 15px rgba(16,185,129,0.3);"><i class="fas fa-user-plus"></i> Daftar</button>
+                    <div id="registrationResult" class="result-box"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content" style="max-width:750px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Riwayat Pengecekan</h2>
+                <button class="modal-close" onclick="closeModal('historyModal')">&times;</button>
+            </div>
+            <div id="unregisteredHistory" class="history-unregistered" style="display:none;">
+                <div class="history-unregistered-icon"><i class="fas fa-lock"></i></div>
+                <h3>Anda Belum Registrasi</h3>
+                <p>Untuk mengakses riwayat pengecekan, Anda perlu membuat akun terlebih dahulu.</p>
+                <div class="history-features">
+                    <div class="history-feature"><div class="history-feature-icon"><i class="fas fa-save"></i></div><div class="history-feature-title">Simpan Riwayat</div><div class="history-feature-desc">Simpan semua hasil pengecekan</div></div>
+                    <div class="history-feature"><div class="history-feature-icon"><i class="fas fa-chart-line"></i></div><div class="history-feature-title">Statistik</div><div class="history-feature-desc">Lihat statistik deteksi Anda</div></div>
+                    <div class="history-feature"><div class="history-feature-icon"><i class="fas fa-cloud"></i></div><div class="history-feature-title">Cloud Sync</div><div class="history-feature-desc">Akses dari berbagai perangkat</div></div>
+                </div>
+                <button class="btn btn-primary" onclick="showRegistrationFromHistory()"><i class="fas fa-user-plus"></i> Daftar Sekarang</button>
+            </div>
+            <div id="registeredHistory" style="display:none;">
+                <table class="history-table"><thead><tr><th>Tanggal</th><th>Konten</th><th>Hasil</th><th>Aksi</th></tr></thead><tbody id="historyTableBody"></tbody></table>
+                <div id="emptyHistory" class="empty-state"><i class="fas fa-history" style="font-size:44px;margin-bottom:12px;opacity:0.3;display:block;"></i><p>Belum ada riwayat pengecekan</p></div>
+                <div style="margin-top:18px;text-align:right;"><button class="btn btn-outline" onclick="clearAllHistory()" style="font-size:13px;padding:8px 16px;"><i class="fas fa-trash"></i> Hapus Semua</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="newsDetailModal" class="modal">
+        <div class="modal-content" style="max-width:650px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Detail Berita</h2>
+                <button class="modal-close" onclick="closeModal('newsDetailModal')">&times;</button>
+            </div>
+            <div id="newsDetailContent"></div>
+        </div>
+    </div>
+
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="brand-section">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2966/2966393.png" alt="FaktaKu" class="logo">
+                    <div class="brand-text"><h1>FaktaKu</h1><p>Platform Deteksi Hoax Terpercaya</p></div>
+                </div>
+                <nav class="nav-section" id="navSection">
+                    <div class="nav-links">
+                        <a href="#" class="nav-link active" onclick="showSection('beranda',event)"><i class="fas fa-home"></i> Beranda</a>
+                        <a href="#" class="nav-link" onclick="openModal('detectionModal');event.preventDefault();"><i class="fas fa-search"></i> Deteksi</a>
+                        <a href="#" class="nav-link" onclick="showSection('berita',event)"><i class="fas fa-newspaper"></i> Berita</a>
+                        <a href="#" class="nav-link" onclick="openModal('historyModal');event.preventDefault();"><i class="fas fa-history"></i> Riwayat</a>
+                    </div>
+                </nav>
+                <div class="actions-section">
+                    <button class="btn btn-primary" id="registerBtn" onclick="openModal('authModal')"><i class="fas fa-user-plus"></i> Registrasi</button>
+                    <div class="user-profile" id="userProfile">
+                        <div class="user-avatar" id="userAvatar"></div>
+                        <span class="user-name" id="userName"></span>
+                        <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+                    </div>
+                    <button class="mobile-menu-toggle" id="mobileMenuToggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="hero" data-aos="fade-up">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h2>Deteksi Hoax dengan Cepat & Akurat</h2>
+                        <p>FaktaKu menggunakan metode <strong>Naive Bayes Classifier</strong> untuk menganalisis kata-kata dalam berita dan mengklasifikasikannya sebagai Fakta atau Hoax berdasarkan probabilitas statistik.</p>
+                        <p>Setiap hasil dilengkapi berita mirip dengan link sumber asli untuk verifikasi langsung.</p>
+                        <button class="btn btn-primary" onclick="openModal('detectionModal')"><i class="fas fa-search"></i> Mulai Deteksi Sekarang</button>
+                    </div>
+                    <div class="hero-visual">
+                        <div class="hero-card"><img src="https://cdn-icons-png.flaticon.com/512/2966/2966393.png" alt="FaktaKu"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stats" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-newspaper"></i></div><div class="stat-number">10,000+</div><div class="stat-label">Berita Dianalisis</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-number">5,000+</div><div class="stat-label">Pengguna Aktif</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-shield-alt"></i></div><div class="stat-number">95%</div><div class="stat-label">Tingkat Akurasi</div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-number">&lt; 5 Detik</div><div class="stat-label">Waktu Deteksi</div></div>
+            </section>
+
+            <section class="features" data-aos="fade-up" data-aos-delay="200">
+                <div class="section-header">
+                    <h2 class="section-title">Mengapa Memilih FaktaKu?</h2>
+                    <p class="section-subtitle">Solusi terbaik untuk deteksi berita hoax berbasis Naive Bayes</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card"><div class="feature-icon"><i class="fas fa-percentage"></i></div><h3 class="feature-title">Persentase Probabilitas</h3><p class="feature-desc">Tampilkan persentase P(Hoax|Teks) dan P(Fakta|Teks) secara visual dengan progress bar dan kartu statistik.</p></div>
+                    <div class="feature-card"><div class="feature-icon"><i class="fas fa-link"></i></div><h3 class="feature-title">Berita Mirip + Link Sumber</h3><p class="feature-desc">Setiap berita mirip dilengkapi link sumber asli yang bisa diklik langsung untuk verifikasi, baik Fakta maupun Hoax.</p></div>
+                    <div class="feature-card"><div class="feature-icon"><i class="fas fa-brain"></i></div><h3 class="feature-title">Naive Bayes Classifier</h3><p class="feature-desc">Menggunakan algoritma Naive Bayes dengan Laplace Smoothing untuk klasifikasi teks berita secara otomatis.</p></div>
+                </div>
+            </section>
+
+            <section class="news-section" id="newsSection" data-aos="fade-up" data-aos-delay="300">
+                <div class="section-header">
+                    <h2 class="section-title">Berita Terkini</h2>
+                    <p class="section-subtitle">Informasi terbaru dari sumber terpercaya</p>
+                </div>
+                <div class="news-grid" id="newsGrid"></div>
+            </section>
+
+            <section class="about-section" id="aboutSection" data-aos="fade-up">
+                <div class="about-content">
+                    <div class="about-grid">
+                        <div class="about-text">
+                            <h3>Tentang FaktaKu</h3>
+                            <p>FaktaKu didirikan pada tahun 2023 dengan misi untuk melawan penyebaran berita palsu dan misinformasi di Indonesia. Kami menggunakan metode Naive Bayes Classifier sebagai algoritma utama untuk klasifikasi teks berita.</p>
+                            <p>Metode Naive Bayes dipilih karena kemampuannya dalam menghitung probabilitas kemunculan kata-kata tertentu dalam kelas Hoax atau Fakta.</p>
+                        </div>
+                        <div class="about-image"><img src="https://images.unsplash.com/photo-1551434678-a074022a1374?w=500&h=400&fit=crop" alt="Tim FaktaKu"></div>
+                    </div>
+                    <div class="team-section">
+                        <h4>Tim Kami</h4>
+                        <div class="team-grid">
+                            <div class="team-member"><div class="team-avatar">👨‍💻</div><div class="team-name">Ahmad Rizki</div><div class="team-role">Lead Developer</div></div>
+                            <div class="team-member"><div class="team-avatar">👩‍🔬</div><div class="team-name">Siti Nurhaliza</div><div class="team-role">Data Scientist</div></div>
+                            <div class="team-member"><div class="team-avatar">👨‍🎓</div><div class="team-name">Budi Santoso</div><div class="team-role">Content Analyst</div></div>
+                            <div class="team-member"><div class="team-avatar">👩‍💼</div><div class="team-name">Maya Putri</div><div class="team-role">Project Manager</div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer><div class="container"><p>&copy; 2025 FaktaKu — Platform Deteksi Hoax dengan Naive Bayes Classifier</p></div></footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <script>
+    let currentUser = null;
+
+    const allNewsData = [
+        { id:1, title:'Menkominfo Blokir 812 Akun Penyebar Hoax Pemilu 2024', source:'Kompas', date:'2024-12-01', image:'https://images.unsplash.com/photo-1504711434969-1761ba6beeb2?w=600&h=300&fit=crop', excerpt:'Kementerian Komunikasi dan Informatika terus berupaya menekan penyebaran hoax terkait Pemilu 2024 dengan memblokir ratusan akun media sosial.', content:'Kementerian Komunikasi dan Informatika (Kominfo) terus berupaya menekan penyebaran hoaks terkait Pemilu 2024. Hingga akhir November 2024, Kominfo telah memblokir total 812 akun media sosial yang terbukti menyebarkan informasi palsu dan menyesatkan.\n\nAkun-akun yang diblokir berasal dari berbagai platform termasuk Facebook, Instagram, Twitter/X, TikTok, dan WhatsApp.', url:'https://www.kompas.com' },
+        { id:2, title:'Kemenpora: Hoax Tiket Gratis Mundial FIFA Klub Friendlies', source:'CNN Indonesia', date:'2024-12-01', image:'https://images.unsplash.com/photo-1560472354-b33ff5ce5042-4d4e2d1e1a0d?w=600&h=300&fit=crop', excerpt:'Kemenpora memastikan informasi tentang tiket gratis pertandingan persahabatan FIFA adalah hoax.', content:'Kementerian Pemuda dan Olahraga (Kemenpora) memastikan bahwa informasi yang beredar di media sosial mengenai tiket gratis pertandingan FIFA Club Friendlies adalah hoaks belaka.', url:'https://www.cnnindonesia.com' },
+        { id:3, title:'Cara Embed Video Google Drive di Website', source:'DetikEdu', date:'2024-11-30', image:'https://images.unsplash.com/photo-1611224942175-767c19e38302?w=600&h=300&fit=crop', excerpt:'Panduan lengkap untuk menyematkan video dari Google Drive ke website.', content:'Bagi para pendidik dan konten kreator, menyematkan video ke website adalah kebutuhan penting.', url:'https://www.detik.com' },
+        { id:4, title:'Antam: Hoax Penipuan Pulsa Hingga Rp 10 Juta', source:'Republika', date:'2024-11-29', image:'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=600&h=300&fit=crop', excerpt:'PT Antam mengingatkan masyarakat waspada terhadap penipuan mengatas nama perusahaan.', content:'PT Aneka Tambang Tbk (Antam) kembali mengingatkan masyarakat untuk waspada terhadap modus penipuan yang mengatas nama perusahaan.', url:'https://www.republika.co.id' },
+        { id:5, title:'Bantuan Kuota Internet Gratis dari Pemerintah', source:'Liputan6', date:'2024-11-28', image:'https://images.unsplash.com/photo-1596524433415-e23a50e669b6?w=600&h=300&fit=crop', excerpt:'Pemerintah kembali menyalurkan bantuan kuota internet gratis untuk pembelajaran jarak jauh.', content:'Pemerintah melalui Kemendikbudristek kembali menyalurkan bantuan kuota internet gratis pada tahap akhir tahun 2024.', url:'https://www.liputan6.com' },
+        { id:6, title:'Cara Embed Video YouTube di PowerPoint', source:'Suara.com', date:'2024-11-27', image:'https://images.unsplash.com/photo-1611162617474-5b21e6e80823?w=600&h=300&fit=crop', excerpt:'Tutorial lengkap untuk menyisipkan video YouTube ke dalam slide PowerPoint.', content:'Menyisipkan video YouTube ke dalam presentasi PowerPoint dapat membuat slide lebih menarik dan interaktif.', url:'https://www.suara.com' }
+    ];
+
+    // Database berita mirip — SEMUA punya url
+    const similarityDB = [
+        { id:'s1', title:'Menkominfo Blokir 812 Akun Penyebar Hoax Pemilu 2024', source:'Kompas', date:'2024-12-01', content:'Kementerian Komunikasi dan Informatika terus berupaya menekan penyebaran hoax terkait Pemilu 2024 dengan memblokir ratusan akun media sosial yang terbukti menyebarkan informasi palsu dan menyesatkan masyarakat luas.', label:'Fakta', url:'https://www.kompas.com/tren/read/2024/12/01/203000465/menkominfo-blokir-812-akun-penyebar-hoax-pemilu-2024' },
+        { id:'s2', title:'Kemenpora: Hoax Tiket Gratis Mundial FIFA Klub Friendlies', source:'CNN Indonesia', date:'2024-12-01', content:'Kemenpora memastikan informasi tentang tiket gratis pertandingan persahabatan FIFA adalah hoax dan mengimbau masyarakat waspada terhadap penipuan bermodus tiket gratis.', label:'Fakta', url:'https://www.cnnindonesia.com/nasional/20241201123456-20-1145679/kemenpora-hoax-tiket-gratis-mundial-fifa' },
+        { id:'s3', title:'Vaksin COVID-19 Mengandung Microchip - HOAX', source:'TurnBackHoax', date:'2024-11-25', content:'Klaim bahwa vaksin COVID-19 mengandung microchip untuk melacak penduduk telah dibantah oleh berbagai organisasi kesehatan dunia termasuk WHO dan CDC. Informasi ini terbukti palsu dan menyesatkan.', label:'Hoax', url:'https://turnbackhoax.id/2024/11/25/vaksin-covid-19-microchip-hoax' },
+        { id:'s4', title:'Antam: Hoax Penipuan Pulsa Hingga Rp 10 Juta', source:'Republika', date:'2024-11-29', content:'PT Antam mengingatkan masyarakat waspada terhadap penipuan mengatas nama perusahaan yang menjanjikan hadiah pulsa dengan nilai fantastis hingga Rp 10 juta melalui SMS dan WhatsApp.', label:'Fakta', url:'https://www.republika.co.id/berita/qp777h290/antam-hoax-penipuan-pulsa-hingga-rp-10-juta' },
+        { id:'s5', title:'Presiden Meninggal Dunia - Berita Palsu yang Viral', source:'TurnBackHoax', date:'2024-11-20', content:'Berita tentang meninggalnya presiden yang tersebar luas melalui media sosial merupakan hoaks belaka. Presiden dalam keadaan sehat dan menjalankan aktivitas seperti biasa. Berita palsu ini sengaja dibuat untuk menimbulkan kepanikan.', label:'Hoax', url:'https://turnbackhoax.id/2024/11/20/presiden-meninggal-dunia-berita-palsu-viral' },
+        { id:'s6', title:'Bantuan Kuota Internet Gratis dari Pemerintah 2024', source:'Liputan6', date:'2024-11-28', content:'Pemerintah melalui Kemendikbud menyalurkan bantuan kuota internet gratis untuk mendukung pembelajaran jarak jauh bagi pelajar dan mahasiswa di seluruh Indonesia menurut kebijakan resmi.', label:'Fakta', url:'https://www.liputan6.com/tekno/read/5678901/bantuan-kuota-internet-gratis-pemerintah-2024' },
+        { id:'s7', title:'Gempa Besar Akan Terjadi Besok - Prediksi Palsu', source:'BMKG / TurnBackHoax', date:'2024-11-15', content:'BMKG menegaskan bahwa prediksi gempa bumi untuk keesokan harinya tidak dapat dilakukan berdasarkan data ilmiah. Informasi tersebut merupakan hoaks yang dapat menimbulkan kepanikan masyarakat.', label:'Hoax', url:'https://turnbackhoax.id/2024/11/15/gempa-besar-akan-terjadi-besok-prediksi-palsu-bmkg' },
+        { id:'s8', title:'Studi: Konsumsi Gula Berlebih Tingkatkan Risiko Diabetes', source:'Tempo', date:'2024-11-22', content:'Penelitian terbaru dari Universitas Indonesia menunjukkan konsumsi gula berlebih secara konsisten meningkatkan risiko diabetes tipe 2 hingga 40 persen berdasarkan data statistik dan bukti ilmiah.', label:'Fakta', url:'https://www.tempo.co/sehat/2024/11/22/studi-konsumsi-gula-berlebih-tingkatkan-risiko-diabetes' },
+        { id:'s9', title:'Pemerintah Sembunyikan Kasus Virus Baru - Konspirasi', source:'TurnBackHoax', date:'2024-11-18', content:'Klaim bahwa pemerintah menyembunyikan informasi tentang virus baru tidak memiliki bukti ilmiah. Kementerian Kesehatan selalu transparan dalam menyampaikan data kesehatan masyarakat menurut laporan resmi.', label:'Hoax', url:'https://turnbackhoax.id/2024/11/18/pemerintah-sembunyikan-kasus-virus-baru-konspirasi-hoax' },
+        { id:'s10', title:'Bill Gates Dana Vaksin untuk Kontrol Penduduk - HOAX', source:'TurnBackHoax', date:'2024-11-10', content:'Narasi bahwa Bill Gates mendanai program vaksinasi untuk mengontrol populasi dunia melalui microchip telah dibantah oleh berbagai faktchecker internasional berdasarkan bukti dan verifikasi.', label:'Hoax', url:'https://turnbackhoax.id/2024/11/10/bill-gates-dana-vaksin-kontrol-penduduk-hoax' },
+        { id:'s11', title:'Data BPS: Pertumbuhan Ekonomi Indonesia Q3 2024', source:'CNBC Indonesia', date:'2024-11-05', content:'Badan Pusat Statistik melaporkan pertumbuhan ekonomi Indonesia pada kuartal III 2024 mencapai 5,1 persen secara year-on-year, didorong oleh konsumsi rumah tangga dan investasi menurut data resmi BPS.', label:'Fakta', url:'https://www.cnbcindonesia.com/ekonomi/2024/11/05/data-bps-pertumbuhan-ekonomi-indonesia-q3-2024' },
+        { id:'s12', title:'Jet Tempur Asing Masuk Wilayah Indonesia - Berita Palsu', source:'TurnBackHoax', date:'2024-11-08', content:'Video yang diklaim sebagai penampakan jet tempur asing melanggar wilayah udara Indonesia ternyata adalah cuplikan dari game simulasi penerbangan yang diedit sedemikian rupa untuk menyesatkan.', label:'Hoax', url:'https://turnbackhoax.id/2024/11/08/jet-tempur-asing-masuk-wilayah-indonesia-game-simulasi-hoax' },
+        { id:'s13', title:'Kloning Gadget Dapat Menyadap Rekening Bank - HOAX', source:'TurnBackHoax', date:'2024-11-12', content:'Informasi bahwa kloning ponsel dapat langsung menyadap rekening bank tanpa interaksi korban merupakan informasi yang menyesatkan dan telah dibantah oleh berbagai pihak keamanan siber.', label:'Hoax', url:'https://turnbackhoax.id/2024/11/12/kloning-gadget-menyadap-rekening-bank-hoax' },
+        { id:'s14', title:'WHO: Vaksin COVID-19 Aman dan Efektif', source:'WHO', date:'2024-11-03', content:'Organisasi Kesehatan Dunia (WHO) menegaskan bahwa vaksin COVID-19 yang telah mendapat izin edar aman dan efektif untuk mencegah gejala berat dan kematian akibat infeksi berdasarkan studi klinis dan bukti ilmiah.', label:'Fakta', url:'https://www.who.int/news/item/03-11-2024-who-covid-19-vaccines-safe-and-effective' },
+        { id:'s15', title:'Kominfo: Isu Hoaks Terkait Pemilu Meningkat 300%', source:'Detik News', date:'2024-11-30', content:'Kementerian Kominfo mencatat peningkatan signifikan hoaks terkait pemilu mencapai 300 persen dibanding periode sebelumnya. Masyarakat diminta waspada dan tidak mudah menyebarkan informasi yang belum terverifikasi.', label:'Fakta', url:'https://news.detik.com/komunikasi/d-7654321/kominfo-isu-hoaks-terkait-pemilu-meningkat-300-persen' },
+        { id:'s16', title:'Hadiah Mobil Gratis dari Pemerintah - Penipuan', source:'TurnBackHoax', date:'2024-11-05', content:'Informasi beredar bahwa pemerintah memberikan hadiah mobil gratis kepada warga melalui undian online. Informasi ini ternyata merupakan modus penipuan untuk mengelabui korban.', label:'Hoax', url:'https://turnbackhoax.id/2024/11/05/hadiah-mobil-gratis-pemerintah-penipuan-hoax' },
+        { id:'s17', title:'Kemendikbud: Bantuan Pendidikan Rp 1 Juta Per Siswa', source:'Kompas', date:'2024-11-02', content:'Kemendikbud menyalurkan bantuan pendidikan sebesar Rp 1 juta per siswa dari keluarga tidak mampu sesuai data yang terverifikasi melalui satuan pendidikan di seluruh Indonesia.', label:'Fakta', url:'https://www.kompas.com/edu/read/2024/11/02/150000765/kemendikbud-bantuan-pendidikan-rp-1-juta-per-siswa' },
+        { id:'s18', title:'Skull Crown Virus Baru Lebih Mematikan - HOAX', source:'TurnBackHoax', date:'2024-11-01', content:'Kabar tentang virus baru bernama Skull Crown yang lebih mematikan dari COVID-19 beredar di media sosial. WHO dan Kemenkes memastikan informasi tersebut palsu dan tidak ada bukti ilmiahnya.', label:'Hoax', url:'https://turnbackhoax.id/2024/11/01/skull-crown-virus-baru-lebih-mematikan-hoax' }
+    ];
+
+    const hoaxWords = ['hoax','palsu','tidak benar','menyesatkan','tipu','penipuan','viral','segera sebarkan','dorong','bagikan sekarang','konspirasi','rahasia','pemerintah sembunyikan','media tidak beritakan','ternyata','kaget','shock','wow','heboh','gila','jangan percaya','fakta sebenarnya','diblokir','dihapus','vaksin berbahaya','bill gates','microchip','nwo','illuminati','freemason','reptilian','flat earth','bumi datar','jet tempur','pesawat tempur','istana','presiden meninggal','gempa besok','gunung meletus besok','prediksi','ramalan','kloning','menyadap','rekening dibobol','hadiah pulsa','tiket gratis','mematikan','skull crown'];
+    const factWords = ['menurut','penelitian','studi','riset','data','statistik','sumber','laporan','kementerian','who','unicef','bmkg','universitas','profesor','dr.','dokter','ahli','pakar','jurnal','terbit','pers','konferensi','seminar','verifikasi','cek fakta','turnbackhoax','kompas','tempo','detik','cnbc','republika','antara','liputan6','survei','poling','indeks','persentase','peringkat','regulasi','undang-undang','keputusan','kebijakan','hasil','kesimpulan','temuan','bukti','evidence','bps','bps melaporkan','persen','year-on-year','aman','efektif','transparan','terverifikasi','resmi','ilimiah','klinis'];
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        initTheme(); initWelcome(); loadUser(); renderNewsGrid(); initScrollHeader();
+        const ta = document.getElementById('newsText'), cc = document.getElementById('charCount');
+        if (ta && cc) ta.addEventListener('input', () => { const l=ta.value.length; cc.textContent=l+' karakter'; cc.style.color=l<20?'var(--danger)':'var(--success)'; });
+    });
+
+    function initWelcome() { if (!sessionStorage.getItem('faktaku_welcome')) setTimeout(() => document.getElementById('welcomeModal').classList.add('active'), 400); }
+    function closeWelcome() { document.getElementById('welcomeModal').classList.remove('active'); sessionStorage.setItem('faktaku_welcome','1'); }
+    function initTheme() { const t=localStorage.getItem('faktaku_theme')||'light'; document.body.setAttribute('data-theme',t); updateThemeIcon(t); }
+    function toggleTheme() { const c=document.body.getAttribute('data-theme'),n=c==='light'?'dark':'light'; document.body.setAttribute('data-theme',n); localStorage.setItem('faktaku_theme',n); updateThemeIcon(n); }
+    function updateThemeIcon(t) { document.getElementById('themeToggleBtn').innerHTML=t==='light'?'<i class="fas fa-moon"></i>':'<i class="fas fa-sun"></i>'; }
+    function initScrollHeader() { window.addEventListener('scroll', () => document.querySelector('header').classList.toggle('scrolled', window.scrollY>50)); }
+    function toggleMobileMenu() { const n=document.getElementById('navSection'); n.classList.toggle('mobile-active'); const i=document.querySelector('#mobileMenuToggle i'); i.classList.toggle('fa-bars'); i.classList.toggle('fa-times'); }
+    function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow='hidden'; if(id==='historyModal') loadHistoryData(); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow=''; }
+    document.addEventListener('click', e => { if(e.target.classList.contains('modal')&&e.target.classList.contains('active')){e.target.classList.remove('active');document.body.style.overflow='';} });
+    document.addEventListener('keydown', e => { if(e.key==='Escape') document.querySelectorAll('.modal.active').forEach(m=>m.classList.remove('active')); document.body.style.overflow=''; });
+
+    function showSection(section, event) {
+        if(event) event.preventDefault();
+        document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+        if(event&&event.currentTarget) event.currentTarget.classList.add('active');
+        const els={hero:document.querySelector('.hero'),stats:document.querySelector('.stats'),features:document.querySelector('.features'),news:document.getElementById('newsSection'),about:document.getElementById('aboutSection')};
+        Object.values(els).forEach(e=>{if(e)e.style.display='none';}); if(els.about) els.about.classList.remove('active');
+        if(section==='beranda'){els.hero.style.display='';els.stats.style.display='';els.features.style.display='';els.news.style.display='';}
+        else if(section==='berita'){els.news.style.display='';}
+        else if(section==='tentang'){els.about.style.display='';els.about.classList.add('active');}
+        document.getElementById('navSection').classList.remove('mobile-active');
+        window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    // ============================================================
+    // AUTH
+    // ============================================================
+    function loadUser() { const u=localStorage.getItem('faktaku_user'); currentUser=u?JSON.parse(u):null; updateAuthUI(); }
+    function updateAuthUI() {
+        const rb=document.getElementById('registerBtn'),up=document.getElementById('userProfile');
+        if(currentUser){rb.style.display='none';up.style.display='flex';document.getElementById('userAvatar').textContent=currentUser.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);document.getElementById('userName').textContent=currentUser.name;}
+        else{rb.style.display='';up.style.display='none';}
+    }
+    function register() {
+        const name=document.getElementById('regName').value.trim(),email=document.getElementById('regEmail').value.trim(),pw=document.getElementById('regPassword').value,cpw=document.getElementById('regConfirmPassword').value,rb=document.getElementById('registrationResult');
+        if(!name||!email||!pw||!cpw) return showFormResult(rb,'error','Semua field harus diisi!');
+        if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showFormResult(rb,'error','Format email tidak valid!');
+        if(pw.length<6) return showFormResult(rb,'error','Password minimal 6 karakter!');
+        if(pw!==cpw) return showFormResult(rb,'error','Konfirmasi password tidak cocok!');
+        const users=JSON.parse(localStorage.getItem('faktaku_users')||'[]');
+        if(users.find(u=>u.email===email)) return showFormResult(rb,'error','Email sudah terdaftar!');
+        users.push({name,email,password:pw,id:Date.now()}); localStorage.setItem('faktaku_users',JSON.stringify(users));
+        showFormResult(rb,'success','Registrasi berhasil! Silakan login.'); document.getElementById('registrationForm').reset();
+    }
+    function login() {
+        const email=document.getElementById('loginEmail').value.trim(),pw=document.getElementById('loginPassword').value,rb=document.getElementById('loginResult');
+        if(!email||!pw) return showFormResult(rb,'error','Email dan password harus diisi!');
+        const users=JSON.parse(localStorage.getItem('faktaku_users')||'[]'),user=users.find(u=>u.email===email&&u.password===pw);
+        if(!user) return showFormResult(rb,'error','Email atau password salah!');
+        currentUser={id:user.id,name:user.name,email:user.email}; localStorage.setItem('faktaku_user',JSON.stringify(currentUser)); updateAuthUI();
+        showFormResult(rb,'success','Selamat datang, '+user.name+'!');
+        setTimeout(()=>{closeModal('authModal');rb.style.display='none';document.getElementById('loginForm').reset();},1200);
+    }
+    function logout(){localStorage.removeItem('faktaku_user');currentUser=null;updateAuthUI();showSection('beranda');}
+    function showRegistrationFromHistory(){closeModal('historyModal');setTimeout(()=>openModal('authModal'),300);}
+
+    // ============================================================
+    // DETEKSI NAIVE BAYES
+    // ============================================================
+    function checkNews() {
+        const text=document.getElementById('newsText').value.trim(),box=document.getElementById('detectionResult');
+        if(!text) return showFormResult(box,'error','Masukkan teks berita yang ingin diperiksa!');
+        if(text.length<20) return showFormResult(box,'error','Teks terlalu pendek. Minimal 20 karakter.');
+        box.className='result-box visible'; box.style.background='rgba(99,102,241,0.05)'; box.style.border='2px solid var(--primary)';
+        box.innerHTML='<div style="text-align:center;padding:30px 0;"><div class="loading-spinner" style="margin:0 auto 14px;"></div><p style="color:var(--text-secondary);font-size:14px;">Menganalisis dengan Naive Bayes Classifier...</p></div>';
+        setTimeout(()=>detectLocal(text),1200);
+    }
+
+    function detectLocal(text) {
+        const lower=text.toLowerCase(), totalWords=text.split(/\s+/).length;
+        let hoaxScore=0,factScore=0;
+        hoaxWords.forEach(w=>{const m=lower.match(new RegExp('\\b'+w+'\\b','gi'));if(m)hoaxScore+=m.length;});
+        factWords.forEach(w=>{const m=lower.match(new RegExp('\\b'+w+'\\b','gi'));if(m)factScore+=m.length;});
+        const alpha=1,classes=2,rawH=(hoaxScore/Math.max(totalWords,1))*10,rawF=(factScore/Math.max(totalWords,1))*10;
+        const sH=(rawH+alpha)/(rawH+rawF+classes*alpha),sF=(rawF+alpha)/(rawH+rawF+classes*alpha),tot=sH+sF;
+        let pH=(sH/tot)*100,pF=(sF/tot)*100;
+        [/!!+/g,/\?{2,}/g,/diblokir/i,/segera/i,/viral/i].forEach(p=>{if(p.test(text))pH+=8;});
+        pH=Math.min(Math.max(pH,5),98); pF=100-pH;
+        const label=pH>=55?'Hoax':'Fakta';
+        const similar=findSimilarNews(text);
+        renderDetectionResult({label,probability_hoax:pH/100,probability_fakta:pF/100,similar_news:similar},text);
+        saveToHistory(text,{label,probability_hoax:pH/100,probability_fakta:pF/100});
+    }
+
+    function findSimilarNews(inputText) {
+        const inputWords=inputText.toLowerCase().split(/\s+/).filter(w=>w.length>3);
+        return similarityDB.map(news=>{
+            const newsWords=(news.title+' '+news.content).toLowerCase().split(/\s+/).filter(w=>w.length>3);
+            const intersection=inputWords.filter(w=>newsWords.includes(w));
+            const union=[...new Set([...inputWords,...newsWords])];
+            return{...news,similarity:union.length>0?intersection.length/union.length:0};
+        }).filter(s=>s.similarity>0.04).sort((a,b)=>b.similarity-a.similarity).slice(0,5);
+    }
+
+    // ============================================================
+    // RENDER HASIL — BERITA MIRIP SELALU PUNYA LINK SUMBER
+    // ============================================================
+    function renderDetectionResult(data) {
+        const box=document.getElementById('detectionResult');
+        const isHoax=data.label==='Hoax';
+        const hP=(data.probability_hoax*100).toFixed(1);
+        const fP=(data.probability_fakta*100).toFixed(1);
+        const mc=isHoax?'var(--danger)':'var(--success)';
+        const bg=isHoax?'rgba(239,68,68,0.04)':'rgba(16,185,129,0.04)';
+
+        box.className='result-box visible'; box.style.background=bg; box.style.border='2px solid '+mc;
+
+        let h=`
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;">
+            <div style="width:54px;height:54px;border-radius:50%;background:${mc};display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;flex-shrink:0;">
+                <i class="fas ${isHoax?'fa-exclamation-triangle':'fa-check-circle'}"></i>
+            </div>
+            <div>
+                <div style="color:${mc};font-size:22px;font-weight:700;margin-bottom:2px;">${data.label.toUpperCase()}</div>
+                <div style="color:var(--text-secondary);font-size:12px;">Hasil analisis menggunakan metode Naive Bayes Classifier</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom:26px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:7px;">
+                <span style="font-weight:600;color:var(--danger);font-size:13px;"><i class="fas fa-times-circle"></i> Hoax: ${hP}%</span>
+                <span style="font-weight:600;color:var(--success);font-size:13px;">Fakta: ${fP}% <i class="fas fa-check-circle"></i></span>
+            </div>
+            <div style="width:100%;height:26px;border-radius:13px;background:rgba(16,185,129,0.12);overflow:hidden;position:relative;box-shadow:inset 0 2px 4px rgba(0,0,0,0.08);">
+                <div id="hoaxBar" style="height:100%;width:0%;background:linear-gradient(90deg,#ef4444,#f97316);border-radius:13px;transition:width 1.4s cubic-bezier(0.25,0.46,0.45,0.94);position:relative;">
+                    <div style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:#fff;font-weight:700;font-size:11px;text-shadow:0 1px 2px rgba(0,0,0,0.3);">${hP}%</div>
+                </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:10px;color:var(--text-muted);">
+                <span>0%</span><span style="color:var(--text-secondary);font-style:italic;">Ambang batas: 55%</span><span>100%</span>
+            </div>
+            <div style="position:relative;height:6px;margin-top:-12px;">
+                <div style="position:absolute;left:55%;top:0;width:2px;height:18px;background:var(--text-muted);border-radius:1px;opacity:0.5;"></div>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:26px;">
+            <div style="padding:14px;border-radius:10px;text-align:center;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);">
+                <div style="font-size:28px;font-weight:700;color:var(--danger);">${hP}%</div>
+                <div style="font-size:11px;color:var(--text-secondary);margin-top:3px;">P(Hoax | Teks)</div>
+            </div>
+            <div style="padding:14px;border-radius:10px;text-align:center;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);">
+                <div style="font-size:28px;font-weight:700;color:var(--success);">${fP}%</div>
+                <div style="font-size:11px;color:var(--text-secondary);margin-top:3px;">P(Fakta | Teks)</div>
+            </div>
+        </div>`;
+
+        // ---- PANEL SUMBER — MUNCUL UNTUK FAKTA DAN HOAX ----
+        const sn = data.similar_news || [];
+        if (sn.length > 0) {
+            const panelClass = isHoax ? 'hoax-panel' : 'fakta-panel';
+            const panelTitle = isHoax ? 'Sumber Pembantahan' : 'Sumber Verifikasi';
+            const panelDesc = isHoax
+                ? 'Berita yang mirip dengan teks Anda telah dibantah oleh sumber-sumber berikut. Klik untuk membaca pembantahan lengkap:'
+                : 'Berita yang mirip dengan teks Anda terverifikasi dari sumber-sumber berikut. Klik untuk membaca berita lengkap:';
+            const panelIcon = isHoax ? 'fa-shield-alt' : 'fa-link';
+
+            h += `<div class="sources-panel ${panelClass}">
+                <h4><i class="fas ${panelIcon}"></i> ${panelTitle}</h4>
+                <p>${panelDesc}</p>`;
+
+            sn.forEach(s => {
+                h += `<a href="${s.url}" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">
+                    <div class="source-item">
+                        <div class="source-icon"><i class="fas fa-newspaper"></i></div>
+                        <div class="source-info">
+                            <span class="source-name">${s.source} — ${s.title}</span>
+                            <span class="source-url-text">${s.url}</span>
+                        </div>
+                        <div class="source-go"><i class="fas fa-external-link-alt"></i></div>
+                    </div>
+                </a>`;
+            });
+
+            h += `</div>`;
+        }
+
+        // ---- BERITA MIRIP DETAIL — SETIAP ITEM PUNYA LINK ----
+        if (sn.length > 0) {
+            h += `<div style="border-top:2px solid var(--border-color);padding-top:22px;margin-top:4px;">
+                <h4 style="font-size:15px;font-weight:700;margin-bottom:4px;color:var(--text-primary);display:flex;align-items:center;gap:8px;">
+                    <i class="fas fa-copy" style="color:var(--primary);"></i> Detail Berita Mirip
+                </h4>
+                <p style="font-size:11px;color:var(--text-muted);margin-bottom:16px;">${sn.length} berita memiliki kemiripan kata dengan teks Anda (Jaccard Similarity)</p>
+                <div style="display:flex;flex-direction:column;gap:10px;">`;
+
+            sn.forEach((n, i) => {
+                const sp = (n.similarity*100).toFixed(1);
+                const nh = n.label==='Hoax';
+                const cardClass = nh ? 'hoax-card' : 'fact-card';
+                const labelClass = nh ? 'hoax' : 'fact';
+
+                h += `<div class="similar-card ${cardClass}">
+                    <div class="similar-card-top">
+                        <div class="similar-card-info">
+                            <div class="similar-card-title">${i+1}. ${n.title}</div>
+                            <div class="similar-card-meta">
+                                <span><i class="fas fa-newspaper"></i> ${n.source}</span>
+                                <span><i class="fas fa-calendar"></i> ${fmtDate(n.date)}</span>
+                                <span class="label-badge ${labelClass}">${n.label}</span>
+                                <span class="sim-badge"><i class="fas fa-percentage"></i> ${sp}% mirip</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="${n.url}" target="_blank" rel="noopener noreferrer" class="source-link-btn">
+                        <i class="fas fa-external-link-alt"></i> Buka Sumber Asli
+                    </a>
+                </div>`;
+            });
+
+            h += `</div></div>`;
+        } else {
+            h += `<div style="border-top:2px solid var(--border-color);padding-top:18px;margin-top:4px;text-align:center;color:var(--text-muted);font-size:12px;">
+                <i class="fas fa-search" style="font-size:18px;margin-bottom:6px;display:block;"></i>Tidak ditemukan berita dengan kemiripan signifikan</div>`;
+        }
+
+        h += `<div style="margin-top:22px;padding:11px 14px;border-radius:8px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.18);font-size:10px;color:var(--text-secondary);line-height:1.5;">
+            <i class="fas fa-info-circle" style="color:var(--warning);"></i> <strong>Catatan:</strong> Hasil ini merupakan analisis berbasis algoritma Naive Bayes Classifier dengan Laplace Smoothing. Selalu verifikasi informasi dari sumber resmi melalui link yang disediakan.
+        </div>`;
+
+        box.innerHTML = h;
+        requestAnimationFrame(() => { requestAnimationFrame(() => { const b=document.getElementById('hoaxBar'); if(b) b.style.width=hP+'%'; }); });
+    }
+
+    function resetForm() {
+        document.getElementById('newsText').value='';
+        const box=document.getElementById('detectionResult'); box.className='result-box'; box.innerHTML='';
+        const cc=document.getElementById('charCount'); cc.textContent='0 karakter'; cc.style.color='var(--text-muted)';
+    }
+
+    // ============================================================
+    // HISTORY
+    // ============================================================
+    function loadHistoryData() {
+        const ur=document.getElementById('unregisteredHistory'),rg=document.getElementById('registeredHistory');
+        if(!currentUser){ur.style.display='block';rg.style.display='none';return;}
+        ur.style.display='none';rg.style.display='block';
+        const hist=JSON.parse(localStorage.getItem('faktaku_history')||'[]'),tb=document.getElementById('historyTableBody'),es=document.getElementById('emptyHistory');
+        if(!hist.length){tb.innerHTML='';es.style.display='block';return;}
+        es.style.display='none';
+        tb.innerHTML=hist.map(item=>`<tr>
+            <td style="white-space:nowrap;">${fmtDate(item.date)}</td>
+            <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(item.text)}</td>
+            <td><span class="badge ${item.label==='Hoax'?'badge-danger':'badge-success'}">${item.label} (${(item.probability_hoax*100).toFixed(1)}%)</span></td>
+            <td><button class="btn-delete" onclick="deleteHistoryItem(${item.id})"><i class="fas fa-trash"></i></button></td>
+        </tr>`).join('');
+    }
+    function saveToHistory(text,data) {
+        if(!currentUser) return;
+        const h=JSON.parse(localStorage.getItem('faktaku_history')||'[]');
+        h.unshift({id:Date.now(),text,label:data.label,probability_hoax:data.probability_hoax,probability_fakta:data.probability_fakta,date:new Date().toISOString()});
+        if(h.length>50) h.length=50; localStorage.setItem('faktaku_history',JSON.stringify(h));
+    }
+    function deleteHistoryItem(id){let h=JSON.parse(localStorage.getItem('faktaku_history')||'[]');h=h.filter(i=>i.id!==id);localStorage.setItem('faktaku_history',JSON.stringify(h));loadHistoryData();}
+    function clearAllHistory(){if(confirm('Yakin ingin menghapus semua riwayat?')){localStorage.removeItem('faktaku_history');loadHistoryData();}}
+
+    // ============================================================
+    // NEWS GRID
+    // ============================================================
+    function renderNewsGrid() {
+        document.getElementById('newsGrid').innerHTML=allNewsData.map(n=>`
+        <article class="news-card">
+            <div class="news-image-wrapper"><img src="${n.image}" alt="${n.title}" class="news-image"></div>
+            <div class="news-content">
+                <div class="news-meta">
+                    <span class="news-date"><i class="fas fa-calendar"></i> ${fmtDate(n.date)}</span>
+                    <span class="news-source"><i class="fas fa-check-circle"></i> ${n.source}</span>
+                </div>
+                <h3 class="news-title">${n.title}</h3>
+                <p class="news-excerpt">${n.excerpt}</p>
+                <button class="btn btn-detail" onclick="showNewsDetail(${n.id})"><i class="fas fa-eye"></i> Lihat Detail</button>
+            </div>
+        </article>`).join('');
+    }
+    function showNewsDetail(id) {
+        const n=allNewsData.find(x=>x.id===id); if(!n) return;
+        document.getElementById('newsDetailContent').innerHTML=`
+            <img src="${n.image}" alt="${n.title}" style="width:100%;height:240px;object-fit:cover;border-radius:12px;margin-bottom:18px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+                <span style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:20px;font-size:11px;background:rgba(99,102,241,0.1);color:var(--primary);font-weight:600;"><i class="fas fa-check-circle"></i> ${n.source}</span>
+                <span style="color:var(--text-muted);font-size:12px;"><i class="fas fa-calendar"></i> ${fmtDate(n.date)}</span>
+            </div>
+            <h3 style="font-size:20px;font-weight:700;color:var(--text-primary);margin-bottom:18px;line-height:1.4;">${n.title}</h3>
+            <div style="color:var(--text-secondary);line-height:1.8;font-size:14px;white-space:pre-line;">${n.content}</div>
+            <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--border-color);display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn btn-primary" onclick="useNewsForDetection(${n.id})"><i class="fas fa-search"></i> Cek Berita Ini</button>
+                <a href="${n.url}" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="text-decoration:none;"><i class="fas fa-external-link-alt"></i> Buka Sumber</a>
+            </div>`;
+        openModal('newsDetailModal');
+    }
+    function useNewsForDetection(id) {
+        const n=allNewsData.find(x=>x.id===id); if(!n) return;
+        closeModal('newsDetailModal');
+        setTimeout(()=>{
+            openModal('detectionModal');
+            document.getElementById('newsText').value=n.title+'. '+n.excerpt;
+            const cc=document.getElementById('charCount'); cc.textContent=document.getElementById('newsText').value.length+' karakter'; cc.style.color='var(--success)';
+        },300);
+    }
+
+    // ============================================================
+    // UTILS
+    // ============================================================
+    function showFormResult(box,type,msg) {
+        box.className='result-box visible';
+        box.style.background=type==='error'?'rgba(239,68,68,0.07)':'rgba(16,185,129,0.07)';
+        box.style.border='2px solid '+(type==='error'?'var(--danger)':'var(--success)');
+        box.innerHTML=`<div style="display:flex;align-items:center;gap:10px;"><i class="fas ${type==='error'?'fa-exclamation-circle':'fa-check-circle'}" style="color:${type==='error'?'var(--danger)':'var(--success)'};font-size:16px;"></i><span style="color:var(--text-primary);font-size:13px;">${msg}</span></div>`;
+    }
+    function fmtDate(d){return new Date(d).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});}
+    function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+    AOS.init({duration:800,once:true});
+    </script>
+</body>
+</html>
