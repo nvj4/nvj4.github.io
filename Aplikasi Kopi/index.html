@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kopitro Prediction Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: {
+                coffee: { 50:'#FDFBF7',100:'#F5E6D3',200:'#E6CCB2',300:'#DDB892',400:'#B08968',500:'#7F5539',600:'#9C6644',700:'#582F0E',800:'#46230A',900:'#2A1204' }
+            }}}
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:#FDFBF7}::-webkit-scrollbar-thumb{background:#B08968;border-radius:4px}::-webkit-scrollbar-thumb:hover{background:#7F5539}
+        .radio-selected{border-color:#9C6644!important;background:#F5E6D3!important;box-shadow:0 0 0 2px rgba(156,102,68,0.3)}
+        @keyframes countUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.count-anim{animation:countUp .4s ease-out}
+        @keyframes rowIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}.row-in{animation:rowIn .35s ease-out forwards}
+        @keyframes toastIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}.toast-in{animation:toastIn .3s ease-out}
+        @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.4}}.pulse-dot{animation:pulseDot 1.5s ease-in-out infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}.spin{animation:spin .8s linear infinite}
+        @keyframes fadeUp{from{opacity:0;max-height:0}to{opacity:1;max-height:3000px}}.fade-up{animation:fadeUp .5s ease-out}
+        @keyframes syncPulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.4)}50%{box-shadow:0 0 0 8px rgba(16,185,129,0)}}
+        .sync-pulse{animation:syncPulse 2s ease-in-out infinite}
+        .sync-badge{transition:all .3s ease}
+        @media print{
+            body*{visibility:hidden!important}
+            #print-area,#print-area*{visibility:visible!important}
+            #print-area{position:absolute;left:0;top:0;width:100%!important;display:block!important;background:#fff!important;color:#000!important;padding:0!important;margin:0!important;font-size:11px!important}
+            #print-area table{width:100%!important;font-size:10px!important;border-collapse:collapse!important}
+            #print-area th,#print-area td{border:1px solid #333!important;padding:4px 6px!important;text-align:left!important}
+            #print-area th{background:#f0f0f0!important;font-weight:bold!important}
+            @page{size:A4 portrait;margin:15mm}
+        }
+    </style>
+</head>
+<body class="bg-coffee-50 text-coffee-900 font-sans min-h-screen flex flex-col antialiased">
+
+<div id="print-area" class="hidden"></div>
+<div id="toast-container" class="fixed top-4 right-4 z-[200] space-y-2" style="max-width:380px"></div>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="login-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-gradient-to-br from-coffee-900 via-coffee-800 to-coffee-950 px-4">
+    <div class="bg-coffee-950/80 backdrop-blur-md p-8 rounded-3xl w-full max-w-md border border-coffee-800 shadow-2xl space-y-6 relative z-10">
+            <div class="text-center">
+            <div class="inline-flex bg-coffee-600 p-3 rounded-2xl mb-3 shadow-lg">
+                <img src="pitro.png" alt="Logo Kopitro" class="w-10 h-10 rounded-lg object-cover">
+            </div>
+            <h2 class="text-2xl font-black text-white tracking-tight">Kopitro Prediction Portal</h2>
+            <p class="text-xs text-coffee-300 mt-1">Gunakan Akun Kredensial Pengelola Kedai</p>
+        </div>
+        <div id="login-error" class="hidden bg-rose-950/60 border border-rose-800 text-rose-200 text-xs px-4 py-3 rounded-xl flex items-center gap-2">
+            <span class="text-base">⚠️</span><span id="login-error-msg"></span>
+        </div>
+        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+            <div><label class="block text-xs font-semibold text-coffee-200 mb-1">Username</label><input type="text" id="login-username" placeholder="Masukkan username" required class="w-full bg-coffee-900/50 border border-coffee-800 text-white rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-coffee-500"></div>
+            <div><label class="block text-xs font-semibold text-coffee-200 mb-1">Password</label><input type="password" id="login-password" placeholder="Masukkan password" required class="w-full bg-coffee-900/50 border border-coffee-800 text-white rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-coffee-500"></div>
+            <button type="submit" id="login-btn" class="w-full bg-coffee-600 hover:bg-coffee-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-md">Masuk ke Sistem</button>
+        </form>
+        <div id="conn-warn" class="hidden p-3 bg-amber-950/50 border border-amber-700 text-amber-200 text-[10px] rounded-xl leading-relaxed">
+            ⚠️ <b>Gagal terhubung ke server.</b><br>
+            Pastikan: (1) XAMPP Apache & MySQL sudah berjalan, (2) File ini diakses via <code class="bg-amber-900 px-1 rounded">http://localhost/KOPITRO/</code> bukan double-click, (3) Folder <code class="bg-amber-900 px-1 rounded">api/</code> ada di samping file ini.
+        </div>
+    </div>
+</div>
+
+<!-- ==================== APP ==================== -->
+<div id="app-content" class="hidden flex-grow flex flex-col min-h-screen">
+    <header class="bg-coffee-900 text-coffee-100 shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-coffee-500 p-1.5 rounded-xl">
+                    <img src="pitro.png" alt="Logo Kopitro" class="w-8 h-8 rounded-lg object-cover">
+                </div>
+                <div><h1 class="text-base sm:text-lg font-bold tracking-tight">Kopitro Prediction Portal</h1><p class="text-[10px] sm:text-xs text-coffee-300">Analisis Regresi Linear Berganda</p></div>
+            </div>
+            <nav class="hidden lg:flex space-x-1">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="px-3 py-2 rounded-lg text-sm font-medium bg-coffee-800 text-white transition-colors">Kalkulator Harian</button>
+                <button onclick="switchTab('forecast')" id="nav-forecast" class="px-3 py-2 rounded-lg text-sm font-medium text-coffee-300 hover:text-white hover:bg-coffee-800 transition-colors">Prediksi & Validasi</button>
+                <button onclick="switchTab('data')" id="nav-data" class="px-3 py-2 rounded-lg text-sm font-medium text-coffee-300 hover:text-white hover:bg-coffee-800 transition-colors">Dataset</button>
+                <button onclick="switchTab('reports')" id="nav-reports" class="px-3 py-2 rounded-lg text-sm font-medium text-coffee-300 hover:text-white hover:bg-coffee-800 transition-colors">Laporan</button>
+            </nav>
+            <div class="flex items-center space-x-3">
+                <span id="user-badge" class="hidden sm:inline-flex px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg bg-coffee-800 text-coffee-200 border border-coffee-700">Admin</span>
+                <button onclick="handleLogout()" class="p-2 rounded-xl text-coffee-300 hover:text-white hover:bg-coffee-800 transition" title="Keluar"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></button>
+            </div>
+        </div>
+    </header>
+    <div class="bg-coffee-800 text-coffee-100 flex justify-around p-2 lg:hidden border-b border-coffee-700 text-[10px] font-semibold">
+        <button onclick="switchTab('dashboard')" class="flex flex-col items-center py-1"><span>Harian</span></button>
+        <button onclick="switchTab('forecast')" class="flex flex-col items-center py-1"><span>Validasi</span></button>
+        <button onclick="switchTab('data')" class="flex flex-col items-center py-1"><span>Dataset</span></button>
+        <button onclick="switchTab('reports')" class="flex flex-col items-center py-1"><span>Laporan</span></button>
+    </div>
+
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+        <!-- ==================== TAB: DASHBOARD ==================== -->
+        <section id="tab-dashboard" class="space-y-8">
+            <div class="bg-gradient-to-r from-coffee-800 to-coffee-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-coffee-700/20 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="absolute bottom-0 left-1/3 w-40 h-40 bg-coffee-600/10 rounded-full translate-y-1/2"></div>
+                <div class="relative z-10 max-w-3xl">
+                    <span class="bg-coffee-600 text-coffee-100 text-xs font-semibold px-2.5 py-1 rounded-md uppercase tracking-wider">Persamaan Analisis Regresi</span>
+                    <h2 class="text-xl sm:text-3xl font-extrabold mt-3 tracking-tight">Prediksi Volume Penjualan Kedai Kopitro</h2>
+                    <div class="mt-6 p-4 bg-coffee-950/60 backdrop-blur-sm rounded-xl border border-coffee-800 font-mono text-xs sm:text-sm overflow-x-auto whitespace-nowrap">
+                        <span class="text-amber-300">Y = 8.5405 + 3.9936(X1) + 3.7708(X2) + 14.8803(X3) + 16.9990(X4)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-coffee-100 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-coffee-900 border-b border-coffee-100 pb-3 mb-5 flex items-center justify-between">
+                            <span>Input Variabel</span>
+                            <button onclick="resetInputs()" class="text-xs text-coffee-500 hover:text-coffee-700 underline font-normal">Reset</button>
+                        </h3>
+                        <div class="space-y-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-coffee-800 mb-2">X1: Cuaca</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label class="relative flex items-center justify-center p-3 rounded-xl border-2 border-coffee-100 hover:border-coffee-300 cursor-pointer transition-all bg-coffee-50/50 radio-selected" id="label-x1-1">
+                                        <input type="radio" name="x1" value="1" checked onchange="updateDashCalc()" class="sr-only">
+                                        <div class="text-center"><span class="block text-xl">☀️</span><span class="block text-xs font-semibold mt-1">Cerah (1)</span></div>
+                                    </label>
+                                    <label class="relative flex items-center justify-center p-3 rounded-xl border-2 border-coffee-100 hover:border-coffee-300 cursor-pointer transition-all bg-coffee-50/50" id="label-x1-0">
+                                        <input type="radio" name="x1" value="0" onchange="updateDashCalc()" class="sr-only">
+                                        <div class="text-center"><span class="block text-xl">🌧️</span><span class="block text-xs font-semibold mt-1">Hujan (0)</span></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-coffee-800 mb-2">X2: Gajian</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label class="relative flex items-center justify-center p-3 rounded-xl border-2 border-coffee-100 hover:border-coffee-300 cursor-pointer transition-all bg-coffee-50/50" id="label-x2-1">
+                                        <input type="radio" name="x2" value="1" onchange="updateDashCalc()" class="sr-only">
+                                        <div class="text-center"><span class="block text-xl">💵</span><span class="block text-xs font-semibold mt-1">Gajian (1)</span></div>
+                                    </label>
+                                    <label class="relative flex items-center justify-center p-3 rounded-xl border-2 border-coffee-100 hover:border-coffee-300 cursor-pointer transition-all bg-coffee-50/50 radio-selected" id="label-x2-0">
+                                        <input type="radio" name="x2" value="0" checked onchange="updateDashCalc()" class="sr-only">
+                                        <div class="text-center"><span class="block text-xl">💼</span><span class="block text-xs font-semibold mt-1">Bukan (0)</span></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-coffee-800 mb-2">X3: Promosi</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label class="relative flex items-center justify-center p-3 rounded-xl border-2 border-coffee-100 hover:border-coffee-300 cursor-pointer transition-all bg-coffee-50/50 radio-selected" id="label-x3-1">
+                                        <input type="radio" name="x3" value="1" checked onchange="updateDashCalc()" class="sr-only">
+                                        <div class="text-center"><span class="block text-xl">📢</span><span class="block text-xs font-semibold mt-1">Ada (1)</span></div>
+                                    </label>
+                                    <label class="relative flex items-center justify-center p-3 rounded-xl border-2 border-coffee-100 hover:border-coffee-300 cursor-pointer transition-all bg-coffee-50/50" id="label-x3-0">
+                                        <input type="radio" name="x3" value="0" onchange="updateDashCalc()" class="sr-only">
+                                        <div class="text-center"><span class="block text-xl">🔇</span><span class="block text-xs font-semibold mt-1">Tidak (0)</span></div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block text-sm font-semibold text-coffee-800">X4: Daring (%)</label>
+                                    <span id="x4-display-val" class="font-mono text-sm bg-coffee-100 px-2 py-0.5 rounded text-coffee-800 font-bold">45%</span>
+                                </div>
+                                <input type="range" id="x4-slider" min="0" max="100" step="1" value="45" oninput="updateDashCalc()" class="w-full h-2 bg-coffee-200 rounded-lg appearance-none cursor-pointer accent-coffee-700">
+                                <div class="flex justify-between text-[10px] text-coffee-500 mt-1"><span>0%</span><span>50%</span><span>100%</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="triggerDashAnim()" class="w-full mt-6 bg-coffee-700 hover:bg-coffee-800 text-white font-semibold py-3 px-4 rounded-xl transition shadow-md">Hitung Prediksi</button>
+                </div>
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-coffee-100 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                        <div class="md:col-span-5 text-center md:text-left">
+                            <span class="text-xs font-semibold text-coffee-500 uppercase tracking-widest block mb-1">Volume Terprediksi (Y)</span>
+                            <div class="my-4 flex items-baseline justify-center md:justify-start">
+                                <span id="prediction-y" class="text-6xl font-extrabold text-coffee-800">—</span>
+                                <span class="text-xl font-bold text-coffee-500 ml-1">Cup</span>
+                            </div>
+                            <p class="text-xs text-coffee-500">Tingkat <span id="prediction-status-badge" class="font-bold text-coffee-400">—</span></p>
+                        </div>
+                        <div class="md:col-span-7 space-y-4 border-t md:border-t-0 md:border-l border-coffee-100 pt-4 md:pt-0 md:pl-6">
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold text-coffee-700 mb-1"><span>Target (50 Cup)</span><span id="target-percentage" class="font-bold">0%</span></div>
+                                <div class="w-full bg-coffee-100 rounded-full h-3 overflow-hidden"><div id="target-progress-bar" class="bg-coffee-600 h-3 rounded-full transition-all duration-500" style="width:0%"></div></div>
+                            </div>
+                            <div class="p-3 bg-amber-50 rounded-xl border border-amber-100 flex items-start gap-2.5">
+                                <span class="text-amber-600 text-lg">💡</span>
+                                <div>
+                                    <h5 class="text-xs font-bold text-amber-900">Analisis Bobot:</h5>
+                                    <p class="text-[11px] text-amber-800 mt-0.5">Daring(X4=16.99) > Promosi(X3=14.88) > Cuaca(X1=3.99) > Gajian(X2=3.77)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-coffee-100">
+                        <h4 class="text-base font-bold text-coffee-900 mb-4">Sensitivitas Daring (X4)</h4>
+                        <div class="relative h-[250px]"><canvas id="sensitivityChart"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB: PREDIKSI & VALIDASI MODEL ==================== -->
+        <section id="tab-forecast" class="hidden space-y-6">
+            <div id="val-section">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+                    <!-- Panel Kiri: Metrik Evaluasi Global -->
+                    <div class="lg:col-span-5 space-y-6">
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-coffee-100">
+                            <h3 class="text-lg font-bold text-coffee-900 border-b border-coffee-100 pb-3 mb-4">Evaluasi Akurasi Model</h3>
+                            <p class="text-xs text-coffee-600 leading-relaxed mb-6">
+                                Metrik keselarasan statistik dihitung berdasarkan data latih riil dari <strong class="text-coffee-800">Dataset_Lengkap_Kopitro_PWA.xlsx</strong>.
+                            </p>
+                                <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs font-bold text-blue-900 uppercase">Rata-Rata Persentase Error (MAPE)</span>
+                                        <span id="metric-mape" class="text-xl font-black text-blue-700">Memuat...</span>
+                                    </div>
+                                    <p class="text-[10px] text-blue-800 mt-1 leading-snug">Rata-rata deviasi persentase prediksi vs aktual. Semakin kecil semakin akurat.</p>
+                                    <div class="mt-2 w-full bg-blue-200 rounded-full h-1.5 overflow-hidden"><div id="mape-bar" class="bg-blue-600 h-1.5 rounded-full transition-all duration-700" style="width:0%"></div></div>
+                                </div>
+                                <div class="p-4 bg-orange-50 rounded-xl border border-orange-100">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-xs font-bold text-orange-900 uppercase">Rata-Rata Selisih Mutlak (MAE)</span>
+                                        <span id="metric-mae" class="text-xl font-black text-orange-700">Memuat...</span>
+                                    </div>
+                                    <p class="text-[10px] text-orange-800 mt-1 leading-snug">Rata-rata absolut deviasi selisih aktual vs kalkulasi regresi.</p>
+                                    <div class="mt-2 w-full bg-orange-200 rounded-full h-1.5 overflow-hidden"><div id="mae-bar" class="bg-orange-600 h-1.5 rounded-full transition-all duration-700" style="width:0%"></div></div>
+                                </div>
+                            </div>
+                       
+                        <div id="val-interpretation" class="bg-coffee-900 text-coffee-100 p-5 rounded-2xl shadow-sm space-y-3">
+                            <h4 class="text-xs font-bold uppercase tracking-widest text-amber-300">Kesimpulan Otomatis</h4>
+                            <p id="val-conclusion-text" class="text-[11px] text-coffee-300 leading-relaxed">Memuat analisis...</p>
+                        </div>
+                    </div>
+
+                    <!-- Panel Kanan: Simulator Validasi Data Baru -->
+                    <div class="lg:col-span-7 bg-white p-6 rounded-2xl shadow-sm border border-coffee-100">
+                        <div class="flex items-center justify-between border-b border-coffee-100 pb-3 mb-4">
+                            <div>
+                                <h3 class="text-lg font-bold text-coffee-900">Simulator Validasi Data Baru</h3>
+                                <p class="text-xs text-coffee-500">Uji performa rumus regresi dengan data aktual baru.</p>
+                            </div>
+                            <!-- Badge sinkronisasi -->
+                            <div id="sync-badge" class="sync-badge flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 border border-emerald-200 text-emerald-700 sync-pulse cursor-pointer" onclick="syncValidationFromDash()" title="Klik untuk sinkronkan ulang dari Kalkulator Harian">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                                <span id="sync-badge-text">Tersinkron</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-coffee-800 mb-1">Input Penjualan Aktual (Cup)</label>
+                                    <input type="number" id="val-actual" value="38" min="0" step="1" oninput="runValidationSimulation()" class="w-full bg-coffee-50 border border-coffee-200 text-coffee-900 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-coffee-700 font-bold">
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="block text-xs font-bold text-coffee-800">Kondisi Cuaca (X1)</label>
+                                        <span id="val-x1-sync-dot" class="w-2 h-2 rounded-full bg-emerald-500" title="Sama dengan Kalkulator"></span>
+                                    </div>
+                                    <select id="val-x1" onchange="onValInputChange()" class="w-full bg-coffee-50 border border-coffee-200 text-coffee-900 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-coffee-700">
+                                        <option value="1">☀️ Cerah (1)</option>
+                                        <option value="0">🌧️ Hujan (0)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="block text-xs font-bold text-coffee-800">Status Gajian (X2)</label>
+                                        <span id="val-x2-sync-dot" class="w-2 h-2 rounded-full bg-emerald-500" title="Sama dengan Kalkulator"></span>
+                                    </div>
+                                    <select id="val-x2" onchange="onValInputChange()" class="w-full bg-coffee-50 border border-coffee-200 text-coffee-900 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-coffee-700">
+                                        <option value="1">💵 Gajian (1)</option>
+                                        <option value="0">💼 Bukan (0)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="block text-xs font-bold text-coffee-800">Intensitas Promosi (X3)</label>
+                                        <span id="val-x3-sync-dot" class="w-2 h-2 rounded-full bg-emerald-500" title="Sama dengan Kalkulator"></span>
+                                    </div>
+                                    <select id="val-x3" onchange="onValInputChange()" class="w-full bg-coffee-50 border border-coffee-200 text-coffee-900 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-coffee-700">
+                                        <option value="1">📢 Ada Promosi (1)</option>
+                                        <option value="0">🔇 Tidak Ada Promosi (0)</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="block text-xs font-bold text-coffee-800">Kontribusi Daring (X4)</label>
+                                        <span id="val-x4-sync-dot" class="w-2 h-2 rounded-full bg-emerald-500" title="Sama dengan Kalkulator"></span>
+                                    </div>
+                                    <input type="range" id="val-x4" min="0" max="1" step="0.01" value="0.45" oninput="onValInputChange()" class="w-full accent-coffee-700">
+                                    <div class="flex justify-between text-[10px] text-coffee-500 mt-1">
+                                        <span>0%</span>
+                                        <span id="val-x4-lbl" class="font-bold text-coffee-800">45%</span>
+                                        <span>100%</span>
+                                    </div>
+                                </div>
+
+                                <!-- Tombol sinkronisasi manual -->
+                                <button onclick="syncValidationFromDash()" class="w-full flex items-center justify-center gap-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold py-2.5 rounded-lg border border-emerald-200 transition-all">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    Sinkronkan dari Kalkulator Harian
+                                </button>
+                            </div>
+
+                            <div class="bg-coffee-50/50 p-5 rounded-2xl border border-coffee-100 flex flex-col justify-between">
+                                <div class="space-y-4">
+                                    <h4 class="text-xs font-bold text-coffee-700 uppercase tracking-widest text-center">Komparasi Hasil Evaluasi</h4>
+                                    <div class="grid grid-cols-2 gap-4 text-center">
+                                        <div class="bg-white p-4 rounded-xl border border-coffee-100 shadow-sm">
+                                            <span class="text-[10px] text-coffee-400 block font-semibold">DATA AKTUAL</span>
+                                            <span id="sim-actual" class="text-3xl font-black text-coffee-800 block mt-1">38</span>
+                                            <span class="text-[10px] text-coffee-500 block">Cup</span>
+                                        </div>
+                                        <div class="bg-white p-4 rounded-xl border-2 border-emerald-200 shadow-sm relative" id="sim-pred-box">
+                                            <!-- Indikator sumber prediksi -->
+                                            <div id="pred-source-tag" class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full whitespace-nowrap flex items-center gap-1">
+                                                <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/></svg>
+                                                Dari Kalkulator
+                                            </div>
+                                            <span class="text-[10px] text-emerald-600 block font-semibold">PREDIKSI MODEL</span>
+                                            <span id="sim-pred" class="text-3xl font-black text-emerald-700 block mt-1">—</span>
+                                            <span class="text-[10px] text-coffee-500 block">Cup</span>
+                                        </div>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <div>
+                                            <div class="flex justify-between text-[10px] font-semibold mb-0.5"><span class="text-coffee-600">Aktual</span><span id="bar-actual-pct" class="text-coffee-800">0%</span></div>
+                                            <div class="w-full bg-coffee-200 rounded-full h-2.5 overflow-hidden"><div id="bar-actual" class="bg-coffee-700 h-2.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
+                                        </div>
+                                        <div>
+                                            <div class="flex justify-between text-[10px] font-semibold mb-0.5"><span class="text-emerald-600">Prediksi</span><span id="bar-pred-pct" class="text-coffee-800">0%</span></div>
+                                            <div class="w-full bg-coffee-200 rounded-full h-2.5 overflow-hidden"><div id="bar-pred" class="bg-emerald-600 h-2.5 rounded-full transition-all duration-500" style="width:0%"></div></div>
+                                        </div>
+                                    </div>
+                                    <div class="border-t border-coffee-200 pt-3 space-y-2">
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-coffee-500">Deviasi (Selisih):</span>
+                                            <span id="sim-deviation" class="font-bold font-mono text-coffee-400">—</span>
+                                        </div>
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-coffee-500">Tingkat Akurasi:</span>
+                                            <span id="sim-accuracy" class="font-bold text-coffee-400">—</span>
+                                        </div>
+                                        <div class="flex justify-between text-xs">
+                                            <span class="text-coffee-500">Kategori:</span>
+                                            <span id="sim-category" class="font-bold text-coffee-400">—</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 space-y-2">
+                                    <button onclick="saveValidationToStats()" id="btn-save-val" class="w-full bg-coffee-800 hover:bg-coffee-900 text-white text-xs font-bold py-2.5 rounded-lg transition-all flex items-center justify-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        Simpan Sebagai Validasi Baru
+                                    </button>
+                                    <button onclick="resetValidationSim()" class="w-full bg-coffee-100 hover:bg-coffee-200 text-coffee-700 text-xs font-semibold py-2 rounded-lg transition-all">Reset Simulator</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ==================== PREDIKSI 7 HARI KE DEPAN ==================== -->
+                <div id="forecast-7day-container" class="hidden mt-8 bg-white p-6 rounded-2xl shadow-sm border border-coffee-100 fade-up">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-coffee-100 pb-3 mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-coffee-900 flex items-center gap-2"><span>📅</span>Prediksi Penjualan 7 Hari ke Depan</h3>
+                            <p class="text-xs text-coffee-500">Dihitung otomatis dengan regresi linear berganda berdasarkan pola data penjualan historis.</p>
+                        </div>
+                        <button onclick="generateForecast7Days()" class="text-xs font-semibold text-coffee-600 hover:text-coffee-800 underline whitespace-nowrap">Hitung Ulang</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse min-w-[640px]">
+                            <thead>
+                                <tr class="bg-coffee-50 text-coffee-700 text-xs font-bold uppercase tracking-wider border-b border-coffee-100">
+                                    <th class="p-3">Hari</th><th class="p-3">Tanggal</th><th class="p-3">Cuaca (X1)</th><th class="p-3">Gajian (X2)</th><th class="p-3">Promosi (X3)</th><th class="p-3">Daring (X4)</th><th class="p-3 font-black text-coffee-900">Prediksi (Cup)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="forecast-7day-tbody" class="text-xs divide-y divide-coffee-100 text-coffee-600"></tbody>
+                            <tfoot>
+                                <tr class="bg-coffee-50/70 font-bold text-coffee-800 text-xs">
+                                    <td class="p-3" colspan="6">Total Prediksi 7 Hari</td>
+                                    <td class="p-3" id="forecast-7day-total">—</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <p id="forecast-7day-basis" class="text-[10px] text-coffee-400 mt-3 leading-relaxed"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB: DATASET ==================== -->
+        <section id="tab-data" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-coffee-100">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-coffee-100 pb-4 mb-4">
+                    <div><h3 class="text-lg font-bold text-coffee-900">Data Penjualan Aktual</h3><p class="text-xs text-coffee-500">Tersambung langsung ke tabel <code class="bg-coffee-100 px-1 rounded">penjualan</code> pada database.</p></div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="dataset-search" oninput="renderPenjualanTable()" placeholder="Cari tanggal..." class="bg-coffee-50 border border-coffee-200 text-coffee-900 rounded-lg p-2 text-xs focus:outline-none focus:ring-2 focus:ring-coffee-700 w-36">
+                        <button onclick="loadPenjualanData()" class="bg-coffee-100 hover:bg-coffee-200 text-coffee-800 text-xs font-semibold py-2 px-3 rounded-lg transition">Refresh</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                    <div class="bg-coffee-50 p-3 rounded-xl border border-coffee-100 text-center"><span class="text-[10px] text-coffee-500 font-bold uppercase block">Total Data</span><span id="ds-total" class="text-lg font-black text-coffee-900">—</span></div>
+                    <div class="bg-coffee-50 p-3 rounded-xl border border-coffee-100 text-center"><span class="text-[10px] text-coffee-500 font-bold uppercase block">Total Penjualan</span><span id="ds-sum" class="text-lg font-black text-coffee-900">—</span></div>
+                    <div class="bg-coffee-50 p-3 rounded-xl border border-coffee-100 text-center"><span class="text-[10px] text-coffee-500 font-bold uppercase block">Rata-Rata</span><span id="ds-avg" class="text-lg font-black text-coffee-900">—</span></div>
+                    <div class="bg-coffee-50 p-3 rounded-xl border border-coffee-100 text-center"><span class="text-[10px] text-coffee-500 font-bold uppercase block">Rata-Rata Daring</span><span id="ds-avg-daring" class="text-lg font-black text-coffee-900">—</span></div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse min-w-[700px]">
+                        <thead>
+                            <tr class="bg-coffee-50 text-coffee-700 text-xs font-bold uppercase tracking-wider border-b border-coffee-100">
+                                <th class="p-3">No</th><th class="p-3">Tanggal</th><th class="p-3 font-black text-coffee-900">Penjualan</th><th class="p-3">Cuaca</th><th class="p-3">Gajian</th><th class="p-3">Promosi</th><th class="p-3">Daring %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="penjualan-tbody" class="text-xs divide-y divide-coffee-100 text-coffee-600"></tbody>
+                    </table>
+                </div>
+                <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                    <span id="penjualan-info" class="text-coffee-500">Memuat...</span>
+                    <div id="dataset-pagination" class="flex items-center gap-2"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB: LAPORAN ==================== -->
+        <section id="tab-reports" class="hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <div class="lg:col-span-1 space-y-3">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-coffee-100">
+                        <h3 class="text-xs font-bold text-coffee-500 uppercase tracking-widest border-b border-coffee-100 pb-2 mb-4">Jenis Laporan</h3>
+                        <div class="space-y-1">
+                            <button onclick="loadLaporan('penjualan')" id="btn-lap-penjualan" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2.5 bg-coffee-800 text-white"><span>📊</span>Laporan Data Penjualan</button>
+                            <button onclick="loadLaporan('prediksi')" id="btn-lap-prediksi" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-coffee-600 hover:bg-coffee-100 transition flex items-center gap-2.5"><span>📈</span>Laporan Hasil Prediksi</button>
+                            <button onclick="loadLaporan('validasi')" id="btn-lap-validasi" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-coffee-600 hover:bg-coffee-100 transition flex items-center gap-2.5"><span>🎯</span>Laporan Evaluasi Model</button>
+                            <button onclick="loadLaporan('promosi')" id="btn-lap-promosi" class="w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-coffee-600 hover:bg-coffee-100 transition flex items-center gap-2.5"><span>📢</span>Laporan Efektivitas Promosi</button>
+                        </div>
+                    </div>
+
+                    <!-- Pengaturan Kop Surat -->
+                   <div class="bg-white p-5 rounded-2xl shadow-sm border border-coffee-100">
+    <button onclick="toggleLetterheadSettings()" class="w-full flex items-center justify-between text-xs font-bold text-coffee-700 uppercase tracking-widest">
+        <span>⚙️ Pengaturan Kop Surat</span>
+        <span id="letterhead-toggle-icon">▾</span>
+    </button>
+    <div id="letterhead-settings" class="hidden mt-4 space-y-3">
+        <div class="flex items-center gap-3">
+            <img id="logo-preview" src="" class="hidden w-12 h-12 rounded-lg object-contain border border-coffee-100 bg-coffee-50">
+            <div id="logo-preview-empty" class="w-12 h-12 rounded-lg border border-dashed border-coffee-200 flex items-center justify-center text-lg bg-coffee-50">☕</div>
+            <label class="flex-1 text-[10px] font-semibold text-coffee-600 bg-coffee-50 hover:bg-coffee-100 border border-coffee-200 rounded-lg py-2 px-2 text-center cursor-pointer transition">
+                Unggah Logo
+                <input type="file" accept="image/*" onchange="handleLogoUpload(this)" class="hidden">
+            </label>
+        </div>
+
+        <div><label class="block text-[10px] font-bold text-coffee-600 mb-1">Nama Usaha</label><input type="text" id="cfg-nama-usaha" oninput="saveCompanyConfig()" placeholder="Kopitro Coffee Shop" class="w-full bg-coffee-50 border border-coffee-200 rounded-lg p-2 text-xs"></div>
+        <div><label class="block text-[10px] font-bold text-coffee-600 mb-1">Alamat</label><input type="text" id="cfg-alamat" oninput="saveCompanyConfig()" placeholder="Jl. Kopi Nikmat No. 1" class="w-full bg-coffee-50 border border-coffee-200 rounded-lg p-2 text-xs"></div>
+        <div class="grid grid-cols-2 gap-2">
+            <div><label class="block text-[10px] font-bold text-coffee-600 mb-1">Kota</label><input type="text" id="cfg-kota" oninput="saveCompanyConfig()" placeholder="Jakarta" class="w-full bg-coffee-50 border border-coffee-200 rounded-lg p-2 text-xs"></div>
+            <div><label class="block text-[10px] font-bold text-coffee-600 mb-1">Telepon</label><input type="text" id="cfg-telepon" oninput="saveCompanyConfig()" placeholder="0812-xxxx" class="w-full bg-coffee-50 border border-coffee-200 rounded-lg p-2 text-xs"></div>
+        </div>
+        <div><label class="block text-[10px] font-bold text-coffee-600 mb-1">Nama Pemilik (untuk TTD)</label><input type="text" id="cfg-nama-pemilik" oninput="saveCompanyConfig()" placeholder="Nama Pemilik" class="w-full bg-coffee-50 border border-coffee-200 rounded-lg p-2 text-xs"></div>
+        <div><label class="block text-[10px] font-bold text-coffee-600 mb-1">Harga Jual per Cup (Rp)</label><input type="number" id="cfg-harga-cup" oninput="saveCompanyConfig()" placeholder="15000" min="0" step="500" class="w-full bg-coffee-50 border border-coffee-200 rounded-lg p-2 text-xs"></div>
+
+        <!-- Upload TTD baru -->
+        <div class="flex items-center gap-3">
+            <img id="ttd-preview" src="" class="hidden w-12 h-12 rounded-lg object-contain border border-coffee-100 bg-coffee-50">
+            <div id="ttd-preview-empty" class="w-12 h-12 rounded-lg border border-dashed border-coffee-200 flex items-center justify-center text-lg bg-coffee-50">✍️</div>
+            <label class="flex-1 text-[10px] font-semibold text-coffee-600 bg-coffee-50 hover:bg-coffee-100 border border-coffee-200 rounded-lg py-2 px-2 text-center cursor-pointer transition">
+                Unggah Tanda Tangan
+                <input type="file" accept="image/*" onchange="handleSignatureUpload(this)" class="hidden">
+            </label>
+        </div>
+    </div>
+</div>
+
+                    <div class="p-4 bg-coffee-900 text-coffee-100 rounded-2xl shadow-sm space-y-3">
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-amber-300">Cetak Laporan</h4>
+                        <p class="text-[10px] text-coffee-300">Tinjau laporan lengkap dengan kop surat sebelum dicetak atau diunduh.</p>
+                        <button onclick="previewLaporan()" class="w-full bg-coffee-600 hover:bg-coffee-700 text-white text-[11px] font-bold py-2.5 rounded-lg transition-all flex items-center justify-center gap-2">👁️ Pratinjau Laporan</button>
+                        <button onclick="downloadLaporanPDF()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold py-2.5 rounded-lg transition-all flex items-center justify-center gap-2">⬇️ Unduh PDF</button>
+                    </div>
+                </div>
+                <div class="lg:col-span-3">
+                    <div id="laporan-panel" class="bg-white p-6 rounded-2xl shadow-sm border border-coffee-100">
+                        <div id="laporan-loading" class="py-8 text-center text-coffee-500 text-sm">Pilih jenis laporan di samping</div>
+                        <div id="laporan-content" class="hidden space-y-4"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- ==================== MODAL PRATINJAU LAPORAN ==================== -->
+<div id="preview-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center bg-coffee-950/70 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+        <div class="flex items-center justify-between p-4 border-b border-coffee-100 bg-coffee-50">
+            <h3 class="text-sm font-bold text-coffee-900">Pratinjau Laporan</h3>
+            <button onclick="closePreviewModal()" class="text-coffee-500 hover:text-coffee-800 text-xl leading-none">&times;</button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-2 bg-coffee-100/50">
+            <div id="preview-modal-content" class="bg-white mx-auto shadow-md" style="max-width:210mm"></div>
+        </div>
+        <div class="p-4 border-t border-coffee-100 bg-coffee-50 flex flex-col sm:flex-row gap-2 justify-end">
+            <button onclick="closePreviewModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-coffee-600 bg-coffee-100 hover:bg-coffee-200 transition">Tutup</button>
+            <button onclick="printFromPreview()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-coffee-700 hover:bg-coffee-800 transition">🖨️ Cetak</button>
+            <button onclick="downloadLaporanPDF()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition">⬇️ Unduh PDF</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+/* ===================================================================
+   STATE GLOBAL — Satu sumber kebenaran untuk kalkulator & validasi
+   =================================================================== */
+var API = 'api/';
+var currentUser = null;
+var sensitivityChartInst = null;
+var serverOK = false;
+var currentLaporanJenis = 'penjualan';
+var penjualanDataCache = [];
+var datasetPage = 1;
+var DATASET_PAGE_SIZE = 15;
+
+/* State sinkronisasi: menyimpan nilai terakhir dari Kalkulator Harian */
+var dashState = {
+    x1: 1,        // Cuaca (dari radio button dashboard)
+    x2: 0,        // Gajian (dari radio button dashboard)
+    x3: 1,        // Promosi (dari radio button dashboard)
+    x4: 0.45,     // Daring (dari slider dashboard, format 0-1)
+    prediction: 0, // Hasil hitungY terakhir dari dashboard
+    isSynced: true // Apakah validasi masih sinkron dengan dashboard
+};
+
+/* ===== PERSAMAAN REGRESI ===== */
+function hitungY(x1, x2, x3, x4) {
+    return 8.5405 + (3.9936 * x1) + (3.7708 * x2) + (14.8803 * x3) + (16.9990 * x4);
+}
+
+/* ===== API WRAPPER ===== */
+function apiFetch(url, opts) {
+    if (!opts) opts = {};
+    var fetchOpts = {
+        method: opts.method || 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin'
+    };
+    if (opts.body !== undefined) fetchOpts.body = opts.body;
+    return fetch(API + url, fetchOpts).then(function(r) {
+        return r.text().then(function(raw) {
+            try { var j = JSON.parse(raw); serverOK = true; return j; }
+            catch (e) { return { success: false, message: 'Respons server tidak valid' }; }
+        });
+    }).catch(function(err) {
+        serverOK = false;
+        return { success: false, message: 'Gagal terhubung: ' + err.message };
+    });
+}
+
+/* ===== TOAST ===== */
+function showToast(msg, type) {
+    if (!type) type = 'info';
+    var c = document.getElementById('toast-container');
+    var cl = {
+        success: 'bg-emerald-800 border-emerald-600 text-emerald-100',
+        error: 'bg-rose-900 border-rose-700 text-rose-100',
+        info: 'bg-coffee-800 border-coffee-600 text-coffee-100',
+        warning: 'bg-amber-800 border-amber-600 text-amber-100'
+    };
+    var ic = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+    var el = document.createElement('div');
+    el.className = (cl[type] || cl.info) + ' border text-xs font-semibold px-4 py-3 rounded-xl shadow-lg toast-in flex items-center gap-2';
+    el.innerHTML = '<span>' + (ic[type] || 'ℹ️') + '</span><span>' + msg + '</span>';
+    c.appendChild(el);
+    setTimeout(function() { el.style.opacity = '0'; el.style.transition = 'opacity .3s'; setTimeout(function() { el.remove(); }, 300); }, 3500);
+}
+
+/* ===== LOGIN ===== */
+function handleLogin(e) {
+    e.preventDefault();
+    document.getElementById('login-error').classList.add('hidden');
+    document.getElementById('conn-warn').classList.add('hidden');
+    var btn = document.getElementById('login-btn');
+    btn.textContent = 'Memverifikasi...';
+    btn.disabled = true;
+    apiFetch('login.php', {
+        method: 'POST',
+        body: JSON.stringify({
+            username: document.getElementById('login-username').value.trim(),
+            password: document.getElementById('login-password').value
+        })
+    }).then(function(res) {
+        btn.textContent = 'Masuk ke Sistem';
+        btn.disabled = false;
+        if (res.success) {
+            currentUser = res.data;
+            enterApp();
+        } else {
+            if (!serverOK) { document.getElementById('conn-warn').classList.remove('hidden'); }
+            else { document.getElementById('login-error-msg').textContent = res.message; document.getElementById('login-error').classList.remove('hidden'); }
+        }
+    });
+}
+
+function handleLogout() {
+    currentUser = null;
+    document.getElementById('app-content').classList.add('hidden');
+    document.getElementById('login-screen').classList.remove('hidden');
+    showToast('Berhasil keluar', 'info');
+}
+
+function enterApp() {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app-content').classList.remove('hidden');
+    document.getElementById('user-badge').textContent = currentUser.nama || 'Admin';
+    showToast('Selamat datang, ' + (currentUser.nama || 'Admin'), 'success');
+    updateDashCalc();
+    loadValidationMetrics();
+    loadCompanyConfig();
+}
+
+function checkSession() {
+    apiFetch('cek_session.php').then(function(res) {
+        if (res.success) { currentUser = res.data; enterApp(); }
+        else { document.getElementById('conn-warn').classList.remove('hidden'); }
+    });
+}
+
+/* ===================================================================
+   DASHBOARD — KALKULATOR HARIAN
+   Setiap perubahan input memperbarui dashState sebagai sumber kebenaran
+   =================================================================== */
+function updateDashCalc() {
+    /* Update visual radio */
+    ['x1', 'x2', 'x3'].forEach(function(n) {
+        var v = document.querySelector('input[name="' + n + '"]:checked').value;
+        document.getElementById('label-' + n + '-1').classList.toggle('radio-selected', v === '1');
+        document.getElementById('label-' + n + '-0').classList.toggle('radio-selected', v === '0');
+    });
+
+    var x1 = +document.querySelector('input[name="x1"]:checked').value;
+    var x2 = +document.querySelector('input[name="x2"]:checked').value;
+    var x3 = +document.querySelector('input[name="x3"]:checked').value;
+    var x4Pct = +document.getElementById('x4-slider').value;
+    var x4 = x4Pct / 100;
+
+    document.getElementById('x4-display-val').textContent = x4Pct + '%';
+
+    var y = Math.max(0, hitungY(x1, x2, x3, x4));
+
+    /* ★ SIMPAN KE STATE GLOBAL — ini sumber kebenaran ★ */
+    dashState.x1 = x1;
+    dashState.x2 = x2;
+    dashState.x3 = x3;
+    dashState.x4 = x4;
+    dashState.prediction = y;
+
+    /* Tampilkan di dashboard */
+    document.getElementById('prediction-y').textContent = y.toFixed(1);
+    var pct = Math.min(100, (y / 50) * 100);
+    document.getElementById('target-percentage').textContent = pct.toFixed(1) + '%';
+    document.getElementById('target-progress-bar').style.width = pct + '%';
+    var st = y >= 50 ? 'Sangat Optimal' : (y >= 40 ? 'Baik' : (y >= 30 ? 'Standar' : 'Rendah'));
+    var cl = y >= 50 ? 'text-emerald-500' : (y >= 40 ? 'text-coffee-600' : (y >= 30 ? 'text-amber-600' : 'text-rose-500'));
+    var badge = document.getElementById('prediction-status-badge');
+    badge.textContent = st;
+    badge.className = 'font-bold ' + cl;
+
+    /* Chart sensitivitas */
+    var labels = [], vals = [];
+    for (var i = 0; i <= 100; i += 5) { labels.push(i + '%'); vals.push(Math.max(0, hitungY(x1, x2, x3, i / 100))); }
+    var ctx = document.getElementById('sensitivityChart').getContext('2d');
+    if (sensitivityChartInst) sensitivityChartInst.destroy();
+    sensitivityChartInst = new Chart(ctx, {
+        type: 'line',
+        data: { labels: labels, datasets: [{ data: vals, borderColor: '#9C6644', backgroundColor: 'rgba(156,102,68,0.1)', fill: true, tension: 0.4, pointRadius: 3, pointBackgroundColor: '#582F0E' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { title: { display: true, text: 'Daring %', font: { size: 11 } }, grid: { display: false } }, y: { beginAtZero: true, title: { display: true, text: 'Cup', font: { size: 11 } } } } }
+    });
+
+    /* ★ Jika validasi sedang terbuka dan masih tersinkron, update juga di sana ★ */
+    if (!document.getElementById('tab-forecast').classList.contains('hidden') && dashState.isSynced) {
+        syncValidationFromDash(true); // silent = true, tanpa toast
+    }
+}
+
+function triggerDashAnim() {
+    var y = dashState.prediction;
+    var today = new Date().toISOString().split('T')[0];
+    var el = document.getElementById('prediction-y');
+    el.style.transform = 'scale(1.15)';
+    setTimeout(function() { el.style.transform = 'scale(1)'; }, 300);
+    var btn = el.closest('section').querySelector('button[onclick="triggerDashAnim()"]');
+    if (btn) { btn.disabled = true; btn.textContent = 'Menyimpan...'; }
+    apiFetch('prediksi.php?action=create', {
+        method: 'POST',
+        body: JSON.stringify({ tanggal_prediksi: today, cuaca: dashState.x1, hari_gajian: dashState.x2, promosi: dashState.x3, persen_daring: dashState.x4 })
+    }).then(function(res) {
+        if (btn) { btn.disabled = false; btn.textContent = 'Hitung Prediksi'; }
+        if (res.success) { showToast('Prediksi ' + today + ' tersimpan: ' + y.toFixed(1) + ' Cup', 'success'); }
+        else { showToast('Gagal simpan: ' + (res.message || ''), 'error'); }
+    }).catch(function() {
+        if (btn) { btn.disabled = false; btn.textContent = 'Hitung Prediksi'; }
+        showToast('Error koneksi server', 'error');
+    });
+}
+
+function resetInputs() {
+    document.querySelector('input[name="x1"][value="1"]').checked = true;
+    document.querySelector('input[name="x2"][value="0"]').checked = true;
+    document.querySelector('input[name="x3"][value="1"]').checked = true;
+    document.getElementById('x4-slider').value = 45;
+    updateDashCalc();
+}
+
+/* ===================================================================
+   SINKRONISASI — Inti koneksi Kalkulator ↔ Validasi
+   =================================================================== */
+
+/**
+ * Menyalin nilai dari dashState ke input simulator validasi.
+ * @param {boolean} silent - jika true, tidak menampilkan toast
+ */
+function syncValidationFromDash(silent) {
+    /* Salin nilai variabel dari state dashboard */
+    document.getElementById('val-x1').value = dashState.x1;
+    document.getElementById('val-x2').value = dashState.x2;
+    document.getElementById('val-x3').value = dashState.x3;
+    document.getElementById('val-x4').value = dashState.x4;
+    document.getElementById('val-x4-lbl').textContent = Math.round(dashState.x4 * 100) + '%';
+
+    /* Tandai sebagai tersinkron */
+    dashState.isSynced = true;
+    updateSyncUI();
+
+    /* Hitung ulang tampilan validasi (pakai prediksi dari dashboard) */
+    runValidationSimulation();
+
+    if (!silent) {
+        showToast('Nilai disinkronkan dari Kalkulator Harian: ' + dashState.prediction.toFixed(1) + ' Cup', 'success');
+    }
+}
+
+/**
+ * Dipanggil ketika user mengubah input di simulator validasi.
+ * Menandai bahwa nilai sudah tidak lagi sama dengan dashboard.
+ */
+function onValInputChange() {
+    /* Update label slider */
+    var x4 = parseFloat(document.getElementById('val-x4').value);
+    document.getElementById('val-x4-lbl').textContent = Math.round(x4 * 100) + '%';
+
+    /* Cek apakah masih cocok dengan dashState */
+    var vx1 = parseInt(document.getElementById('val-x1').value);
+    var vx2 = parseInt(document.getElementById('val-x2').value);
+    var vx3 = parseInt(document.getElementById('val-x3').value);
+
+    var stillSynced = (
+        vx1 === dashState.x1 &&
+        vx2 === dashState.x2 &&
+        vx3 === dashState.x3 &&
+        Math.abs(x4 - dashState.x4) < 0.005
+    );
+    dashState.isSynced = stillSynced;
+    updateSyncUI();
+    runValidationSimulation();
+}
+
+/**
+ * Memperbarui tampilan indikator sinkronisasi (badge, dot, tag)
+ */
+function updateSyncUI() {
+    var badge = document.getElementById('sync-badge');
+    var badgeText = document.getElementById('sync-badge-text');
+    var predBox = document.getElementById('sim-pred-box');
+    var predTag = document.getElementById('pred-source-tag');
+
+    /* Dot indikator per variabel */
+    var vx1 = parseInt(document.getElementById('val-x1').value);
+    var vx2 = parseInt(document.getElementById('val-x2').value);
+    var vx3 = parseInt(document.getElementById('val-x3').value);
+    var vx4 = parseFloat(document.getElementById('val-x4').value);
+    setSyncDot('val-x1-sync-dot', vx1 === dashState.x1);
+    setSyncDot('val-x2-sync-dot', vx2 === dashState.x2);
+    setSyncDot('val-x3-sync-dot', vx3 === dashState.x3);
+    setSyncDot('val-x4-sync-dot', Math.abs(vx4 - dashState.x4) < 0.005);
+
+    if (dashState.isSynced) {
+        /* Tersinkron — tampilan hijau */
+        badge.className = 'sync-badge flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 border border-emerald-200 text-emerald-700 sync-pulse cursor-pointer';
+        badgeText.textContent = 'Tersinkron';
+        predBox.className = 'bg-white p-4 rounded-xl border-2 border-emerald-200 shadow-sm relative';
+        predTag.className = 'absolute -top-2.5 left-1/2 -translate-x-1/2 bg-emerald-600 text-white text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full whitespace-nowrap flex items-center gap-1';
+        predTag.innerHTML = '<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101"/></svg> Dari Kalkulator';
+    } else {
+        /* Tidak tersinkron — tampilan kuning/peringatan */
+        badge.className = 'sync-badge flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 border border-amber-300 text-amber-700 cursor-pointer';
+        badgeText.textContent = 'Tidak Sinkron';
+        predBox.className = 'bg-white p-4 rounded-xl border-2 border-amber-300 shadow-sm relative';
+        predTag.className = 'absolute -top-2.5 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full whitespace-nowrap flex items-center gap-1';
+        predTag.innerHTML = '<svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Manual (Bedakan)';
+    }
+}
+
+function setSyncDot(id, isMatch) {
+    var dot = document.getElementById(id);
+    if (!dot) return;
+    if (isMatch) {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+        dot.title = 'Sama dengan Kalkulator';
+    } else {
+        dot.className = 'w-2 h-2 rounded-full bg-amber-500';
+        dot.title = 'Berbeda dari Kalkulator';
+    }
+}
+
+/* ===================================================================
+   VALIDASI SIMULATOR — Prediksi selalu mengacu pada sumber yang benar
+   =================================================================== */
+function runValidationSimulation() {
+    var actual = parseFloat(document.getElementById('val-actual').value);
+    var x1 = parseInt(document.getElementById('val-x1').value);
+    var x2 = parseInt(document.getElementById('val-x2').value);
+    var x3 = parseInt(document.getElementById('val-x3').value);
+    var x4 = parseFloat(document.getElementById('val-x4').value);
+
+    /* ★ INTI KONEKSI: jika tersinkron, pakai prediksi dari dashboard.
+       Jika tidak, hitung ulang dari input validasi yang dimodifikasi user ★ */
+    var pred;
+    if (dashState.isSynced) {
+        pred = dashState.prediction; // Langsung ambil dari kalkulator harian
+    } else {
+        pred = Math.max(0, hitungY(x1, x2, x3, x4)); // Hitung ulang dari input manual
+    }
+
+    /* Update tampilan angka prediksi */
+    document.getElementById('sim-pred').textContent = pred.toFixed(1);
+    document.getElementById('sim-actual').textContent = isNaN(actual) ? '—' : actual;
+
+    if (isNaN(actual) || actual <= 0) {
+        document.getElementById('sim-deviation').textContent = '—';
+        document.getElementById('sim-deviation').className = 'font-bold font-mono text-coffee-400';
+        document.getElementById('sim-accuracy').textContent = '—';
+        document.getElementById('sim-accuracy').className = 'font-bold text-coffee-400';
+        document.getElementById('sim-category').textContent = '—';
+        document.getElementById('sim-category').className = 'font-bold text-coffee-400';
+        document.getElementById('bar-actual').style.width = '0%';
+        document.getElementById('bar-pred').style.width = '0%';
+        document.getElementById('bar-actual-pct').textContent = '0%';
+        document.getElementById('bar-pred-pct').textContent = '0%';
+        return;
+    }
+
+    /* Hitung deviasi & akurasi */
+    var dev = actual - pred;
+    var acc = Math.max(0, (1 - Math.abs(dev) / actual) * 100);
+    var maxVal = Math.max(actual, pred, 1);
+
+    document.getElementById('sim-deviation').textContent = (dev >= 0 ? '+' : '') + dev.toFixed(1) + ' Cup';
+    document.getElementById('sim-deviation').className = 'font-bold font-mono ' + (Math.abs(dev) <= 3 ? 'text-emerald-600' : 'text-rose-600');
+
+    document.getElementById('sim-accuracy').textContent = acc.toFixed(1) + '%';
+    document.getElementById('sim-accuracy').className = 'font-bold ' + (acc >= 95 ? 'text-emerald-600' : acc >= 85 ? 'text-blue-600' : acc >= 70 ? 'text-amber-600' : 'text-rose-600');
+
+    var catText, catClass;
+    if (acc >= 95) { catText = 'Sangat Akurat'; catClass = 'bg-emerald-100 text-emerald-800'; }
+    else if (acc >= 85) { catText = 'Akurat'; catClass = 'bg-blue-100 text-blue-800'; }
+    else if (acc >= 70) { catText = 'Cukup Akurat'; catClass = 'bg-amber-100 text-amber-800'; }
+    else { catText = 'Kurang Akurat'; catClass = 'bg-rose-100 text-rose-800'; }
+    var catEl = document.getElementById('sim-category');
+    catEl.textContent = catText;
+    catEl.className = 'font-bold px-2 py-0.5 rounded-md ' + catClass;
+
+    /* Progress bar */
+    var actualPct = (actual / maxVal) * 100;
+    var predPct = (pred / maxVal) * 100;
+    document.getElementById('bar-actual').style.width = actualPct + '%';
+    document.getElementById('bar-pred').style.width = predPct + '%';
+    document.getElementById('bar-actual-pct').textContent = actualPct.toFixed(0) + '%';
+    document.getElementById('bar-pred-pct').textContent = predPct.toFixed(0) + '%';
+}
+
+function resetValidationSim() {
+    document.getElementById('val-actual').value = '';
+    syncValidationFromDash(true);
+    document.getElementById('sim-actual').textContent = '—';
+    showToast('Simulator direset dan disinkronkan ulang', 'info');
+}
+
+function saveValidationToStats() {
+    var actual = parseFloat(document.getElementById('val-actual').value);
+    if (isNaN(actual) || actual <= 0) {
+        showToast('Masukkan nilai penjualan aktual yang valid', 'warning');
+        return;
+    }
+    var btn = document.getElementById('btn-save-val');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full"></div> Menyimpan...';
+
+    /* Ambil prediksi yang sedang ditampilkan (sudah pasti sinkron) */
+    var predText = document.getElementById('sim-pred').textContent;
+    var pred = parseFloat(predText);
+    var mae = Math.abs(actual - pred);
+    var mape = actual !== 0 ? (Math.abs(actual - pred) / actual) * 100 : 0;
+    var today = new Date().toISOString().split('T')[0];
+
+    var resetBtn = function() {
+        btn.disabled = false;
+        btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Simpan Sebagai Validasi Baru';
+    };
+
+    /* ★ Simpan ke DUA tabel sekaligus:
+       1) validasi_model  -> metrik evaluasi (mae, mape, r2)
+       2) penjualan       -> jumlah cup aktual + variabel x1-x4, jadi data historis
+          yang dipakai generateForecast7Days() untuk prediksi 7 hari ke depan ★ */
+    Promise.all([
+        apiFetch('validasi.php?action=create', {
+            method: 'POST',
+            body: JSON.stringify({ mae: mae.toFixed(2), mape: mape.toFixed(2) })
+        }),
+        apiFetch('penjualan.php?action=create', {
+            method: 'POST',
+            body: JSON.stringify({
+                tanggal: today,
+                jumlah_penjualan: actual,
+                cuaca: dashState.x1,
+                hari_gajian: dashState.x2,
+                promosi: dashState.x3,
+                persen_daring: dashState.x4
+            })
+        })
+    ]).then(function(results) {
+        resetBtn();
+        var resValidasi = results[0];
+        var resPenjualan = results[1];
+
+        if (resValidasi.success && resPenjualan.success) {
+            showToast('Validasi disimpan: Aktual=' + actual + ', Prediksi=' + pred.toFixed(1) + ' Cup', 'success');
+            loadValidationMetrics();
+            /* ★ Tampilkan prediksi 7 hari ke depan setelah validasi tersimpan ★ */
+            generateForecast7Days();
+        } else if (!resValidasi.success && !resPenjualan.success) {
+            showToast('Gagal menyimpan validasi & penjualan: ' + (resValidasi.message || resPenjualan.message || ''), 'error');
+        } else if (!resValidasi.success) {
+            showToast('Penjualan tersimpan, tapi validasi gagal: ' + (resValidasi.message || ''), 'warning');
+        } else {
+            showToast('Validasi tersimpan, tapi penjualan gagal: ' + (resPenjualan.message || ''), 'warning');
+        }
+    }).catch(function() {
+        resetBtn();
+        showToast('Gagal terhubung ke server', 'error');
+    });
+}
+
+/* ===================================================================
+   PREDIKSI 7 HARI KE DEPAN — dihitung dari pola data penjualan riil
+   =================================================================== */
+function generateForecast7Days() {
+    var container = document.getElementById('forecast-7day-container');
+    container.classList.remove('hidden');
+    var tbody = document.getElementById('forecast-7day-tbody');
+    tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-coffee-400"><div class="animate-spin w-6 h-6 border-2 border-coffee-200 border-t-coffee-700 rounded-full mx-auto"></div><p class="mt-2 text-xs">Menghitung prediksi dari data historis...</p></td></tr>';
+    document.getElementById('forecast-7day-total').textContent = '—';
+
+    apiFetch('penjualan.php?action=read').then(function(res) {
+        var data = (res.success && res.data && res.data.length) ? res.data : [];
+        var pattern = analyzeSalesPattern(data);
+        var rows = buildForecastRows(pattern);
+        renderForecast7Day(rows);
+
+        var basisEl = document.getElementById('forecast-7day-basis');
+        if (data.length) {
+            basisEl.textContent = 'Basis perhitungan: pola cuaca dari ' + pattern.sampleSize + ' data penjualan terakhir, hari gajian mengikuti tanggal 25-2 setiap bulan, intensitas promosi mode (' + (pattern.x3Mode ? 'Ada' : 'Tidak Ada') + '), dan rata-rata kontribusi daring ' + Math.round(pattern.x4Avg * 100) + '%. Rumus: Y = 8.5405 + 3.9936(X1) + 3.7708(X2) + 14.8803(X3) + 16.9990(X4).';
+        } else {
+            basisEl.textContent = 'Belum ada data penjualan pada database, prediksi menggunakan asumsi default (Cerah, Bukan Gajian, Ada Promosi, Daring 45%).';
+        }
+    });
+}
+
+/**
+ * Menganalisa pola dari data penjualan riil untuk dijadikan dasar
+ * asumsi variabel X1-X4 pada prediksi 7 hari ke depan.
+ */
+function analyzeSalesPattern(data) {
+    if (!data.length) {
+        return { x1Cycle: [1, 0, 1, 1, 0, 1, 1], x3Mode: 1, x4Avg: 0.45, sampleSize: 0 };
+    }
+    var recent = data.slice(-14); // 14 data penjualan terakhir sebagai basis pola
+    var x1s = recent.map(function(d) { return parseInt(d.cuaca) || 0; });
+    var x3Counts = { 0: 0, 1: 0 };
+    var x4Sum = 0;
+    recent.forEach(function(d) {
+        var x3v = parseInt(d.promosi) || 0;
+        x3Counts[x3v] = (x3Counts[x3v] || 0) + 1;
+        x4Sum += parseFloat(d.persen_daring !== undefined ? d.persen_daring : (d.daring || 0)) || 0;
+    });
+    var x3Mode = x3Counts[1] >= x3Counts[0] ? 1 : 0;
+    var x4Avg = recent.length ? (x4Sum / recent.length) : 0.45;
+    if (x4Avg > 1) x4Avg = x4Avg / 100; // jaga-jaga jika data tersimpan dalam format persen (0-100)
+    return { x1Cycle: x1s.length ? x1s : [1, 0], x3Mode: x3Mode, x4Avg: x4Avg, sampleSize: recent.length };
+}
+
+/**
+ * Membangun 7 baris prediksi untuk 7 hari ke depan berdasarkan pola.
+ */
+function buildForecastRows(pattern) {
+    var rows = [];
+    var today = new Date();
+    var namaHari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at", 'Sabtu'];
+    for (var i = 1; i <= 7; i++) {
+        var d = new Date(today);
+        d.setDate(d.getDate() + i);
+        var dayOfMonth = d.getDate();
+        var x1 = pattern.x1Cycle[(i - 1) % pattern.x1Cycle.length];
+        var x2 = (dayOfMonth >= 25 || dayOfMonth <= 2) ? 1 : 0; // pola gajian akhir/awal bulan
+        var x3 = pattern.x3Mode;
+        var x4 = pattern.x4Avg;
+        var y = Math.max(0, hitungY(x1, x2, x3, x4));
+        rows.push({ date: d, namaHari: namaHari[d.getDay()], x1: x1, x2: x2, x3: x3, x4: x4, y: y });
+    }
+    return rows;
+}
+
+function renderForecast7Day(rows) {
+    var tbody = document.getElementById('forecast-7day-tbody');
+    var html = '';
+    var total = 0;
+    rows.forEach(function(r, idx) {
+        total += r.y;
+        var tgl = r.date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+        html += '<tr class="row-in" style="animation-delay:' + (idx * 0.05) + 's">';
+        html += '<td class="p-3 font-bold text-coffee-800">' + r.namaHari + '</td>';
+        html += '<td class="p-3">' + tgl + '</td>';
+        html += '<td class="p-3">' + (r.x1 == 1 ? '☀️ Cerah' : '🌧️ Hujan') + '</td>';
+        html += '<td class="p-3">' + (r.x2 == 1 ? '💵 Ya' : '💼 Tidak') + '</td>';
+        html += '<td class="p-3">' + (r.x3 == 1 ? '📢 Ada' : '🔇 Tidak') + '</td>';
+        html += '<td class="p-3">' + Math.round(r.x4 * 100) + '%</td>';
+        html += '<td class="p-3 font-black text-coffee-900">' + r.y.toFixed(1) + '</td>';
+        html += '</tr>';
+    });
+    tbody.innerHTML = html;
+    document.getElementById('forecast-7day-total').textContent = total.toFixed(1) + ' Cup';
+}
+
+/* ===== METRIK VALIDASI (dari server) ===== */
+function loadValidationMetrics() {
+    try {
+        apiFetch('validasi.php?action=read').then(function(res) {
+            if (res.success && res.data && res.data.length) {
+                var d = res.data[0];
+                var mapeEl = document.getElementById('metric-mape');
+                var maeEl = document.getElementById('metric-mae');
+                if (mapeEl) { mapeEl.textContent = d.mape !== undefined ? parseFloat(d.mape).toFixed(2) + '%' : '—'; }
+                if (maeEl) { maeEl.textContent = d.mae !== undefined ? parseFloat(d.mae).toFixed(2) : '—'; }
+
+                if (d.mape !== undefined) document.getElementById('mape-bar').style.width = Math.min(100, parseFloat(d.mape)) + '%';
+                if (d.mae !== undefined) document.getElementById('mae-bar').style.width = Math.min(100, (parseFloat(d.mae) / 10) * 100) + '%';
+
+                var conc = document.getElementById('val-conclusion-text');
+                if (conc && d.mape !== undefined) {
+                    var mape = parseFloat(d.mape) || 0;
+                    var interp = 'Rata-rata error (MAPE) sebesar ' + mape.toFixed(2) + '% menandakan bahwa ';
+                    if (mape < 10) interp += 'prediksi model <strong class="text-emerald-400">sangat akurat</strong>.';
+                    else if (mape < 20) interp += 'prediksi model <strong class="text-amber-400">cukup akurat</strong>.';
+                    else interp += 'prediksi model <strong class="text-rose-400">perlu perbaikan</strong>.';
+                    conc.innerHTML = interp;
+                }
+            }
+        });
+    } catch (e) { /* server offline, abaikan */ }
+}
+
+/* ===== NAVIGASI TAB ===== */
+function switchTab(tab) {
+    ['dashboard', 'forecast', 'data', 'reports'].forEach(function(t) {
+        var el = document.getElementById('tab-' + t);
+        if (el) el.classList.add('hidden');
+        var nav = document.getElementById('nav-' + t);
+        if (nav) { nav.classList.remove('bg-coffee-800', 'text-white'); nav.classList.add('text-coffee-300'); }
+    });
+    var tabEl = document.getElementById('tab-' + tab);
+    if (tabEl) tabEl.classList.remove('hidden');
+    var navEl = document.getElementById('nav-' + tab);
+    if (navEl) { navEl.classList.add('bg-coffee-800', 'text-white'); navEl.classList.remove('text-coffee-300'); }
+
+    /* ★ Ketika masuk tab Validasi, otomatis sinkronkan dari Kalkulator ★ */
+    if (tab === 'forecast') {
+        syncValidationFromDash(true);
+    }
+
+    if (tab === 'data') loadPenjualanData();
+    if (tab === 'dashboard') updateDashCalc();
+}
+
+/* ===================================================================
+   DATASET — tersambung penuh ke tabel `penjualan` pada database
+   =================================================================== */
+function loadPenjualanData() {
+    var tbody = document.getElementById('penjualan-tbody');
+    var info = document.getElementById('penjualan-info');
+    if (tbody) tbody.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-coffee-400"><div class="animate-spin w-6 h-6 border-2 border-coffee-200 border-t-coffee-700 rounded-full mx-auto"></div><p class="mt-2 text-xs">Memuat data...</p></td></tr>';
+    apiFetch('penjualan.php?action=read').then(function(res) {
+        if (res.success && res.data && res.data.length) {
+            penjualanDataCache = res.data;
+            datasetPage = 1;
+            renderPenjualanTable();
+        } else {
+            penjualanDataCache = [];
+            tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-coffee-400 text-sm">Tidak ada data ditemukan pada database</td></tr>';
+            if (info) info.textContent = 'Tidak ada data';
+            resetDatasetSummary();
+            document.getElementById('dataset-pagination').innerHTML = '';
+        }
+    }).catch(function() {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-rose-400 text-sm">Gagal memuat data dari server</td></tr>';
+        if (info) info.textContent = 'Error koneksi';
+    });
+}
+
+function resetDatasetSummary() {
+    document.getElementById('ds-total').textContent = '0';
+    document.getElementById('ds-sum').textContent = '0';
+    document.getElementById('ds-avg').textContent = '0';
+    document.getElementById('ds-avg-daring').textContent = '0%';
+}
+
+/**
+ * Merender seluruh isi tabel penjualan (dari database) dengan
+ * pencarian tanggal & paginasi di sisi klien agar tetap ringan
+ * meski jumlah data sangat banyak.
+ */
+function renderPenjualanTable() {
+    var tbody = document.getElementById('penjualan-tbody');
+    var info = document.getElementById('penjualan-info');
+    var search = (document.getElementById('dataset-search').value || '').toLowerCase().trim();
+
+    var filtered = penjualanDataCache.filter(function(d) {
+        return !search || (d.tanggal || '').toLowerCase().indexOf(search) !== -1;
+    });
+
+    /* Ringkasan statistik dari SELURUH data (bukan hanya yang tampil) */
+    var sum = 0, daringSum = 0;
+    penjualanDataCache.forEach(function(d) {
+        sum += parseFloat(d.penjualan) || 0;
+        var dr = parseFloat(d.persen_daring !== undefined ? d.persen_daring : (d.daring || 0)) || 0;
+        daringSum += dr > 1 ? dr / 100 : dr;
+    });
+    var count = penjualanDataCache.length;
+    document.getElementById('ds-total').textContent = count;
+    document.getElementById('ds-sum').textContent = sum.toFixed(0) + ' Cup';
+    document.getElementById('ds-avg').textContent = count ? (sum / count).toFixed(1) + ' Cup' : '0';
+    document.getElementById('ds-avg-daring').textContent = count ? Math.round((daringSum / count) * 100) + '%' : '0%';
+
+    /* Paginasi */
+    var totalPages = Math.max(1, Math.ceil(filtered.length / DATASET_PAGE_SIZE));
+    if (datasetPage > totalPages) datasetPage = totalPages;
+    var start = (datasetPage - 1) * DATASET_PAGE_SIZE;
+    var pageData = filtered.slice(start, start + DATASET_PAGE_SIZE);
+
+    if (!pageData.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-8 text-center text-coffee-400 text-sm">Tidak ada data yang cocok</td></tr>';
+    } else {
+        var html = '';
+        for (var i = 0; i < pageData.length; i++) {
+            var d = pageData[i];
+            html += '<tr class="hover:bg-coffee-50/50 transition-colors">';
+            html += '<td class="p-3 font-bold text-coffee-800">' + (start + i + 1) + '</td>';
+            html += '<td class="p-3">' + d.tanggal + '</td>';
+            html += '<td class="p-3 font-bold text-coffee-900">' + d.penjualan + '</td>';
+            html += '<td class="p-3">' + (d.cuaca == 1 ? '☀️ Cerah' : '🌧️ Hujan') + '</td>';
+            html += '<td class="p-3">' + (d.hari_gajian == 1 ? '💵 Ya' : '💼 Tidak') + '</td>';
+            html += '<td class="p-3">' + (d.promosi == 1 ? '📢 Ada' : '🔇 Tidak') + '</td>';
+            var vDaring = d.persen_daring !== undefined ? d.persen_daring : (d.daring || 0);
+            html += '<td class="p-3">' + Math.round(vDaring * (vDaring > 1 ? 1 : 100)) + '%</td>';
+            html += '</tr>';
+        }
+        tbody.innerHTML = html;
+    }
+
+    if (info) info.textContent = 'Menampilkan ' + pageData.length + ' dari ' + filtered.length + ' data (total database: ' + count + ')';
+
+    renderDatasetPagination(totalPages);
+}
+
+function renderDatasetPagination(totalPages) {
+    var el = document.getElementById('dataset-pagination');
+    if (totalPages <= 1) { el.innerHTML = ''; return; }
+    var html = '';
+    html += '<button onclick="gotoDatasetPage(' + (datasetPage - 1) + ')" ' + (datasetPage <= 1 ? 'disabled' : '') + ' class="px-2.5 py-1.5 rounded-lg border border-coffee-200 text-coffee-600 disabled:opacity-30 hover:bg-coffee-50">‹</button>';
+    html += '<span class="px-2 font-semibold text-coffee-700">Halaman ' + datasetPage + ' / ' + totalPages + '</span>';
+    html += '<button onclick="gotoDatasetPage(' + (datasetPage + 1) + ')" ' + (datasetPage >= totalPages ? 'disabled' : '') + ' class="px-2.5 py-1.5 rounded-lg border border-coffee-200 text-coffee-600 disabled:opacity-30 hover:bg-coffee-50">›</button>';
+    el.innerHTML = html;
+}
+
+function gotoDatasetPage(p) {
+    datasetPage = p;
+    renderPenjualanTable();
+}
+
+/* ===================================================================
+   LAPORAN — dengan kop surat, logo, tanda tangan, pratinjau & PDF
+   =================================================================== */
+function loadLaporan(jenis) {
+    currentLaporanJenis = jenis;
+    ['penjualan', 'prediksi', 'validasi', 'promosi'].forEach(function(j) {
+        var btn = document.getElementById('btn-lap-' + j);
+        if (btn) {
+            if (j === jenis) { btn.className = 'w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2.5 bg-coffee-800 text-white'; }
+            else { btn.className = 'w-full text-left px-3 py-2.5 rounded-xl text-xs font-bold text-coffee-600 hover:bg-coffee-100 transition flex items-center gap-2.5'; }
+        }
+    });
+    var loading = document.getElementById('laporan-loading');
+    var content = document.getElementById('laporan-content');
+    loading.classList.remove('hidden');
+    loading.innerHTML = '<div class="flex flex-col items-center py-8"><div class="animate-spin w-8 h-8 border-4 border-coffee-200 border-t-coffee-700 rounded-full"></div><p class="mt-3 text-coffee-500 text-sm">Memuat laporan ' + jenis + '...</p></div>';
+    content.classList.add('hidden');
+    content.innerHTML = '';
+
+    apiFetch('laporan.php?jenis=' + jenis).then(function(res) {
+        if (res.success && res.data && !isEmptyLaporanData(res.data)) {
+            loading.classList.add('hidden');
+            content.classList.remove('hidden');
+            renderLaporanContent(content, jenis, res.data, false);
+        } else {
+            /* ★ laporan.php kosong/gagal — hitung otomatis dari data yang sudah pasti tersambung ★ */
+            buildLaporanFallback(jenis).then(function(data) {
+                loading.classList.add('hidden');
+                content.classList.remove('hidden');
+                if (data) {
+                    renderLaporanContent(content, jenis, data, true);
+                } else {
+                    content.innerHTML = '<div class="py-8 text-center text-coffee-400"><p class="text-3xl mb-2">📭</p><p class="text-sm">Belum ada data untuk laporan ' + laporanJenisLabel(jenis).toLowerCase() + '</p><p class="text-[11px] mt-1">Pastikan sudah ada data pada tabel terkait di database.</p></div>';
+                }
+            });
+        }
+    }).catch(function() {
+        buildLaporanFallback(jenis).then(function(data) {
+            loading.classList.add('hidden');
+            content.classList.remove('hidden');
+            if (data) {
+                renderLaporanContent(content, jenis, data, true);
+            } else {
+                content.innerHTML = '<div class="py-8 text-center text-rose-400"><p class="text-3xl mb-2">⚠️</p><p class="text-sm">Gagal memuat laporan dari server</p></div>';
+            }
+        });
+    });
+}
+
+function isEmptyLaporanData(data) {
+    if (!data) return true;
+    if (Array.isArray(data)) return data.length === 0;
+    if (typeof data === 'object') return Object.keys(data).length === 0;
+    return false;
+}
+
+/**
+ * Fallback: hitung laporan langsung dari endpoint yang sudah terbukti
+ * tersambung (penjualan.php, validasi.php, prediksi.php), dipakai saat
+ * laporan.php belum tersedia/lengkap di server.
+ */
+function buildLaporanFallback(jenis) {
+    if (jenis === 'penjualan') {
+        return apiFetch('penjualan.php?action=read').then(function(res) {
+            if (!res.success || !res.data || !res.data.length) return null;
+            var rows = res.data;
+            var vals = rows.map(function(d) { return parseFloat(d.penjualan) || 0; });
+            var total = vals.reduce(function(a, b) { return a + b; }, 0);
+            return { total: total, rata_rata: total / vals.length, tertinggi: Math.max.apply(null, vals), terendah: Math.min.apply(null, vals), _rows: rows };
+        }).catch(function() { return null; });
+    }
+    if (jenis === 'validasi') {
+        return apiFetch('validasi.php?action=read').then(function(res) {
+            if (!res.success || !res.data) return null;
+            return res.data;
+        }).catch(function() { return null; });
+    }
+    if (jenis === 'prediksi') {
+        return apiFetch('prediksi.php?action=read').then(function(res) {
+            if (res.success && res.data && res.data.length) return { _rows: res.data };
+            return null;
+        }).catch(function() { return null; });
+    }
+    if (jenis === 'promosi') {
+    return apiFetch('penjualan.php?action=read').then(function(res) {
+        if (!res.success || !res.data || !res.data.length) return null;
+        var rows = res.data;
+        var dg = [], tanpa = [];
+        rows.forEach(function(d) {
+            var v = parseFloat(d.penjualan) || 0;
+            if (parseInt(d.promosi) === 1) dg.push(v); else tanpa.push(v);
+        });
+        var avgDg = dg.length ? dg.reduce(function(a,b){return a+b;},0)/dg.length : 0;
+        var avgTanpa = tanpa.length ? tanpa.reduce(function(a,b){return a+b;},0)/tanpa.length : 0;
+        var selisih = avgDg - avgTanpa;
+        var persen = avgTanpa > 0 ? (selisih/avgTanpa)*100 : 0;
+        return { jumlah_hari_promosi: dg.length, jumlah_hari_non_promosi: tanpa.length, rata_rata_promosi: avgDg, rata_rata_non_promosi: avgTanpa, selisih: selisih, persen_kenaikan: persen, _rows: rows };
+    }).catch(function() { return null; });
+    }
+}
+
+function renderLaporanContent(el, jenis, data, isFallback) {
+    var html = '';
+    if (isFallback) {
+        html += '<div class="mb-2 inline-flex items-center gap-1.5 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full"><span>ℹ️</span>Dihitung otomatis dari data penjualan/validasi tersimpan (endpoint laporan.php belum tersedia)</div>';
+    }
+
+    if (jenis === 'penjualan' && data) {
+        html += '<div class="grid grid-cols-2 md:grid-cols-4 gap-4">';
+        html += '<div class="bg-coffee-50 p-4 rounded-xl border border-coffee-100"><span class="text-[10px] text-coffee-500 font-bold uppercase block">Total Penjualan</span><span class="text-xl font-black text-coffee-900">' + (data.total || 0) + ' Cup</span></div>';
+        html += '<div class="bg-coffee-50 p-4 rounded-xl border border-coffee-100"><span class="text-[10px] text-coffee-500 font-bold uppercase block">Rata-Rata</span><span class="text-xl font-black text-coffee-700">' + (data.rata_rata ? parseFloat(data.rata_rata).toFixed(1) : 0) + ' Cup</span></div>';
+        html += '<div class="bg-coffee-50 p-4 rounded-xl border border-coffee-100"><span class="text-[10px] text-coffee-500 font-bold uppercase block">Tertinggi</span><span class="text-xl font-black text-emerald-600">' + (data.tertinggi || 0) + ' Cup</span></div>';
+        html += '<div class="bg-coffee-50 p-4 rounded-xl border border-coffee-100"><span class="text-[10px] text-coffee-500 font-bold uppercase block">Terendah</span><span class="text-xl font-black text-rose-600">' + (data.terendah || 0) + ' Cup</span></div>';
+        html += '</div>';
+        var rows = data.tabel || data._rows;                 // ★ FIX: tabel, bukan hanya _rows
+        if (rows && rows.length) html += renderLaporanRowsTable(rows, false, !data._rows);
+
+    } else if (jenis === 'validasi' && data) {
+        var latest = Array.isArray(data) ? data[0] : data;
+        var r2v = latest.r2 !== undefined ? latest.r2 : latest.r_squared;   // ★ FIX: dukung kedua nama
+        html += '<div class="grid grid-cols-3 gap-4">';
+        html += '<div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 text-center"><span class="text-[10px] text-emerald-600 font-bold uppercase block">R²</span><span class="text-2xl font-black text-emerald-700">' + (r2v !== undefined ? parseFloat(r2v).toFixed(4) : '—') + '</span></div>';
+        html += '<div class="bg-blue-50 p-4 rounded-xl border border-blue-100 text-center"><span class="text-[10px] text-blue-600 font-bold uppercase block">MAPE</span><span class="text-2xl font-black text-blue-700">' + (latest.mape !== undefined ? parseFloat(latest.mape).toFixed(2) + '%' : '—') + '</span></div>';
+        html += '<div class="bg-orange-50 p-4 rounded-xl border border-orange-100 text-center"><span class="text-[10px] text-orange-600 font-bold uppercase block">MAE</span><span class="text-2xl font-black text-orange-700">' + (latest.mae !== undefined ? parseFloat(latest.mae).toFixed(2) : '—') + '</span></div>';
+        html += '</div>';
+        if (latest.jumlah_data !== undefined) {
+            html += '<p class="text-[11px] text-coffee-500 mt-3">' + (latest.keterangan || ('Berdasarkan ' + latest.jumlah_data + ' data penjualan')) + '</p>';
+        }
+        var riwayat = Array.isArray(data) ? data.slice(1) : (data.riwayat || []);   // ★ FIX: ambil dari data.riwayat
+        if (riwayat.length) {
+            html += '<h4 class="text-xs font-bold text-coffee-700 mt-4 mb-2">Riwayat Validasi</h4>';
+            html += renderValidasiRowsTable(riwayat);
+        }
+
+    } else if (jenis === 'prediksi' && data) {
+        var prows = data.tabel || data._rows || [];          // ★ FIX: tabel, bukan hanya _rows
+        html += '<div class="bg-coffee-50 p-4 rounded-xl border border-coffee-100 mb-4"><span class="text-[10px] text-coffee-500 font-bold uppercase block">Jumlah Prediksi Tersimpan</span><span class="text-xl font-black text-coffee-900">' + (data.jumlah_data !== undefined ? data.jumlah_data : prows.length) + '</span></div>';
+        if (prows.length) html += renderLaporanRowsTable(prows, true, !data._rows);
+
+    } else if (jenis === 'promosi' && data) {
+        html += '<div class="grid grid-cols-2 md:grid-cols-4 gap-4">';
+        html += '<div class="bg-coffee-50 p-4 rounded-xl border border-coffee-100"><span class="text-[10px] text-coffee-500 font-bold uppercase block">Hari Promosi</span><span class="text-xl font-black text-coffee-900">' + data.jumlah_hari_promosi + '</span></div>';
+        html += '<div class="bg-coffee-50 p-4 rounded-xl border border-coffee-100"><span class="text-[10px] text-coffee-500 font-bold uppercase block">Hari Tanpa Promosi</span><span class="text-xl font-black text-coffee-900">' + data.jumlah_hari_non_promosi + '</span></div>';
+        html += '<div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100"><span class="text-[10px] text-emerald-600 font-bold uppercase block">Rata² Saat Promosi</span><span class="text-xl font-black text-emerald-700">' + data.rata_rata_promosi.toFixed(1) + ' Cup</span></div>';
+        html += '<div class="bg-coffee-50 p-4 rounded-xl border border-coffee-100"><span class="text-[10px] text-coffee-500 font-bold uppercase block">Rata² Tanpa Promosi</span><span class="text-xl font-black text-coffee-700">' + data.rata_rata_non_promosi.toFixed(1) + ' Cup</span></div>';
+        html += '</div>';
+        html += '<div class="mt-4 p-3 rounded-xl border ' + (data.selisih >= 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100') + '">';
+        html += '<span class="text-xs font-bold ' + (data.selisih >= 0 ? 'text-emerald-700' : 'text-rose-700') + '">Selisih: ' + (data.selisih >= 0 ? '+' : '') + data.selisih.toFixed(1) + ' Cup (' + (data.persen_kenaikan >= 0 ? '+' : '') + data.persen_kenaikan.toFixed(1) + '%)</span>';
+        html += '<p class="text-[11px] text-coffee-600 mt-1">' + (data.kesimpulan || '') + '</p>';
+        html += '</div>';
+        var promoRows = data.tabel || data._rows;
+        if (promoRows && promoRows.length) html += renderLaporanRowsTable(promoRows, false, !data._rows);
+    }
+
+    el.innerHTML = html;
+}
+
+/* alreadyLabeled = true jika data dari laporan.php (cuaca/promosi/gajian sudah berupa teks) */
+function renderLaporanRowsTable(rows, isPrediksi, alreadyLabeled) {
+    var html = '<div class="overflow-x-auto mt-2"><table class="w-full text-left border-collapse min-w-[500px]">';
+    html += '<thead><tr class="bg-coffee-50 text-coffee-700 text-[10px] font-bold uppercase tracking-wider border-b border-coffee-100">';
+    html += isPrediksi
+        ? '<th class="p-2">No</th><th class="p-2">Tanggal</th><th class="p-2">Cuaca</th><th class="p-2">Gajian</th><th class="p-2">Promosi</th><th class="p-2">Daring</th><th class="p-2">Prediksi</th>'
+        : '<th class="p-2">No</th><th class="p-2">Tanggal</th><th class="p-2">Penjualan</th><th class="p-2">Cuaca</th><th class="p-2">Gajian</th><th class="p-2">Promosi</th><th class="p-2">Daring</th>';
+    html += '</tr></thead><tbody class="text-[11px] divide-y divide-coffee-100 text-coffee-600">';
+    var shown = rows.slice(0, 30);
+
+    function cuacaLabel(d) { return alreadyLabeled ? d.cuaca : (d.cuaca == 1 ? 'Cerah' : 'Hujan'); }
+    function gajianLabel(d) { return alreadyLabeled ? d.hari_gajian : (d.hari_gajian == 1 ? 'Ya' : 'Tidak'); }
+    function promoLabel(d) { return alreadyLabeled ? d.promosi : (d.promosi == 1 ? 'Ada' : 'Tidak'); }
+    function daringPct(d) {
+        if (alreadyLabeled) return d.daring; // sudah string "45%" (prediksi) atau angka 0-1 (penjualan)
+        var v = d.persen_daring !== undefined ? d.persen_daring : (d.daring || 0);
+        return Math.round(v * (v > 1 ? 1 : 100)) + '%';
+    }
+
+    shown.forEach(function(d, i) {
+        if (isPrediksi) {
+            html += '<tr><td class="p-2 font-semibold">' + (i + 1) + '</td><td class="p-2">' + (d.tanggal_prediksi || d.tanggal || '-') + '</td><td class="p-2">' + cuacaLabel(d) + '</td><td class="p-2">' + gajianLabel(d) + '</td><td class="p-2">' + promoLabel(d) + '</td><td class="p-2">' + (typeof daringPct(d) === 'string' && daringPct(d).indexOf('%') !== -1 ? daringPct(d) : daringPct(d)) + '</td><td class="p-2 font-bold text-coffee-900">' + (d.hasil_prediksi !== undefined ? parseFloat(d.hasil_prediksi).toFixed(1) : (d.prediksi !== undefined ? parseFloat(d.prediksi).toFixed(1) : '-')) + '</td></tr>';
+        } else {
+            var dv = alreadyLabeled ? Math.round((d.persen_daring || 0) * 100) + '%' : (Math.round((d.persen_daring !== undefined ? d.persen_daring : (d.daring || 0)) * 100) + '%');
+            html += '<tr><td class="p-2 font-semibold">' + (i + 1) + '</td><td class="p-2">' + (d.tanggal || '-') + '</td><td class="p-2 font-bold text-coffee-900">' + (d.penjualan || 0) + '</td><td class="p-2">' + cuacaLabel(d) + '</td><td class="p-2">' + gajianLabel(d) + '</td><td class="p-2">' + promoLabel(d) + '</td><td class="p-2">' + dv + '</td></tr>';
+        }
+    });
+    html += '</tbody></table></div>';
+    if (rows.length > shown.length) html += '<p class="text-[10px] text-coffee-400 mt-2">Menampilkan ' + shown.length + ' dari ' + rows.length + ' baris data.</p>';
+    return html;
+}
+
+
+function renderValidasiRowsTable(rows) {
+    var html = '<div class="overflow-x-auto mt-2"><table class="w-full text-left border-collapse min-w-[400px]">';
+    html += '<thead><tr class="bg-coffee-50 text-coffee-700 text-[10px] font-bold uppercase tracking-wider border-b border-coffee-100">';
+    html += '<th class="p-2">No</th><th class="p-2">Tanggal</th><th class="p-2">R²</th><th class="p-2">MAE</th><th class="p-2">MAPE</th>';
+    html += '</tr></thead><tbody class="text-[11px] divide-y divide-coffee-100 text-coffee-600">';
+    var shown = rows.slice(0, 30);
+    shown.forEach(function(d, i) {
+        var tgl = d.created_at ? new Date(d.created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+        html += '<tr><td class="p-2 font-semibold">' + (i + 1) + '</td><td class="p-2">' + tgl + '</td><td class="p-2">' + parseFloat(d.r2).toFixed(4) + '</td><td class="p-2">' + parseFloat(d.mae).toFixed(2) + '</td><td class="p-2">' + parseFloat(d.mape).toFixed(2) + '%</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    if (rows.length > shown.length) html += '<p class="text-[10px] text-coffee-400 mt-2">Menampilkan ' + shown.length + ' dari ' + rows.length + ' baris data.</p>';
+    return html;
+}
+
+
+/* ===== Konfigurasi Kop Surat (nama usaha, alamat, logo, ttd) ===== */
+function toggleLetterheadSettings() {
+    var el = document.getElementById('letterhead-settings');
+    var icon = document.getElementById('letterhead-toggle-icon');
+    el.classList.toggle('hidden');
+    icon.textContent = el.classList.contains('hidden') ? '▾' : '▴';
+}
+
+/* ===== Konfigurasi Kop Surat — sekarang dari SERVER, bukan localStorage ===== */
+var companyConfigCache = null;
+
+function getCompanyConfig() {
+    var defaults = { namaUsaha: 'Kopitro Coffee Shop', alamat: 'Jl. Kopi Nikmat No. 1', kota: 'Jakarta', telepon: '0812-xxxx-xxxx', namaPemilik: '', logo: '', ttd: '', hargaPerCup: 15000 };
+    return companyConfigCache ? Object.assign(defaults, companyConfigCache) : defaults;
+}
+
+function saveCompanyConfig() {
+    var cfg = {
+        namaUsaha: document.getElementById('cfg-nama-usaha').value.trim(),
+        alamat: document.getElementById('cfg-alamat').value.trim(),
+        kota: document.getElementById('cfg-kota').value.trim(),
+        telepon: document.getElementById('cfg-telepon').value.trim(),
+        namaPemilik: document.getElementById('cfg-nama-pemilik').value.trim(),
+        hargaPerCup: parseFloat(document.getElementById('cfg-harga-cup').value) || 15000
+    };
+    companyConfigCache = Object.assign(companyConfigCache || {}, cfg);
+    apiFetch('config.php?action=save', { method: 'POST', body: JSON.stringify(companyConfigCache) });
+}
+
+function loadCompanyConfig() {
+    apiFetch('config.php?action=read').then(function(res) {
+        companyConfigCache = (res.success && res.data) ? res.data : {};
+        var cfg = getCompanyConfig();
+        document.getElementById('cfg-nama-usaha').value = cfg.namaUsaha || '';
+        document.getElementById('cfg-alamat').value = cfg.alamat || '';
+        document.getElementById('cfg-kota').value = cfg.kota || '';
+        document.getElementById('cfg-telepon').value = cfg.telepon || '';
+        document.getElementById('cfg-nama-pemilik').value = cfg.namaPemilik || '';
+        document.getElementById('cfg-harga-cup').value = cfg.hargaPerCup || 15000;
+
+        if (cfg.logo) {
+            document.getElementById('logo-preview').src = cfg.logo;
+            document.getElementById('logo-preview').classList.remove('hidden');
+            document.getElementById('logo-preview-empty').classList.add('hidden');
+        }
+        if (cfg.ttd) {
+            document.getElementById('ttd-preview').src = cfg.ttd;
+            document.getElementById('ttd-preview').classList.remove('hidden');
+            document.getElementById('ttd-preview-empty').classList.add('hidden');
+        }
+    });
+}
+
+function handleLogoUpload(input) {
+    var file = input.files[0];
+    var formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", "logo");
+
+    fetch("api/upload_config.php", { method: "POST", body: formData })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                var busted = data.path + '?v=' + Date.now();
+                document.getElementById("logo-preview").src = busted;
+                document.getElementById("logo-preview").classList.remove('hidden');
+                document.getElementById("logo-preview-empty").classList.add('hidden');
+                companyConfigCache = companyConfigCache || {};
+                companyConfigCache.logo = busted;
+                showToast("Logo berhasil diunggah", "success");
+            } else {
+                showToast(data.message || "Gagal unggah logo", "error");
+            }
+        });
+}
+
+function handleSignatureUpload(input) {
+    var file = input.files[0];
+    var formData = new FormData();
+    formData.append("file", file);
+    formData.append("type", "ttd");
+
+    fetch("api/upload_config.php", { method: "POST", body: formData })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.success) {
+                var busted = data.path + '?v=' + Date.now();
+                document.getElementById("ttd-preview").src = busted;
+                document.getElementById("ttd-preview").classList.remove('hidden');
+                document.getElementById("ttd-preview-empty").classList.add('hidden');
+                companyConfigCache = companyConfigCache || {};
+                companyConfigCache.ttd = busted;
+                showToast("Tanda tangan berhasil diunggah", "success");
+            } else {
+                showToast(data.message || "Gagal unggah tanda tangan", "error");
+            }
+        });
+}   function defaultLogoDataUri() {
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="%23582F0E"/><path d="M16 26c0-2 2-4 4-4h20a4 4 0 014 4v14a10 10 0 01-10 10H26a10 10 0 01-10-10V26z" fill="none" stroke="%23F5E6D3" stroke-width="3"/><path d="M44 28h4a4 4 0 014 4v2a4 4 0 01-4 4h-4" fill="none" stroke="%23F5E6D3" stroke-width="3"/></svg>';
+    return 'data:image/svg+xml,' + svg;
+}
+
+function laporanJenisLabel(j) {
+    var map = { penjualan: 'Laporan Data Penjualan', prediksi: 'Laporan Hasil Prediksi', validasi: 'Laporan Evaluasi Model', promosi: 'Laporan Efektivitas Promosi' };
+    return map[j] || 'Laporan';
+}
+
+function formatTanggalIndonesia(d) {
+    var bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    return d.getDate() + ' ' + bulan[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+/**
+ * Menyusun dokumen laporan lengkap: kop surat (logo, nama usaha, alamat),
+ * tanggal & kota, isi laporan yang sedang dipilih, dan blok tanda tangan pemilik.
+ */
+function buildLaporanDocument() {
+    var panel = document.getElementById('laporan-content');
+    if (!panel || !panel.innerHTML.trim() || panel.classList.contains('hidden')) return null;
+    var cfg = getCompanyConfig();
+    var now = new Date();
+    var tanggalStr = formatTanggalIndonesia(now);
+    var jenisLabel = laporanJenisLabel(currentLaporanJenis);
+    var logoSrc = cfg.logo || defaultLogoDataUri();
+    var kota = cfg.kota || 'Jakarta';
+
+    var ttdBlock = cfg.ttd
+        ? '<img src="' + cfg.ttd + '" style="height:70px;object-fit:contain;margin:0 auto;">'
+        : '<div style="height:70px;"></div>';
+
+    var html = ''
+        + '<div style="font-family:Inter,Arial,sans-serif;color:#2A1204;padding:28px;background:#fff;">'
+        + '  <div style="position:relative;text-align:center;border-bottom:3px solid #582F0E;padding-bottom:16px;margin-bottom:20px;">'
+        + '    <img src="' + logoSrc + '" style="position:absolute;left:0;top:0;width:60px;height:60px;object-fit:contain;border-radius:8px;">'
+        + '    <div style="font-size:19px;font-weight:800;letter-spacing:-.3px;">' + (cfg.namaUsaha || 'Kopitro Coffee Shop') + '</div>'
+        + '    <div style="font-size:11px;color:#7F5539;">' + (cfg.alamat || '-') + (kota ? (', ' + kota) : '') + '</div>'
+        + '    <div style="font-size:11px;color:#7F5539;">Telp: ' + (cfg.telepon || '-') + '</div>'
+        + '  </div>'
+        + '  <div style="text-align:right;font-size:11px;margin-bottom:16px;color:#46230A;">' + kota + ', ' + tanggalStr + '</div>'
+        + '  <h3 style="text-align:center;font-size:15px;font-weight:800;text-decoration:underline;text-transform:uppercase;margin-bottom:22px;letter-spacing:.3px;">' + jenisLabel + '</h3>'
+        + '  <div style="font-size:12px;">' + panel.innerHTML + '</div>'
+        + '  <div style="display:flex;justify-content:flex-end;margin-top:70px;">'
+        + '    <div style="text-align:center;font-size:12px;min-width:200px;">'
+        + '      <div>Mengetahui,</div>'
+        + '      <div>Pemilik Usaha</div>'
+        + '      ' + ttdBlock
+        + '      <div style="font-weight:700;border-top:1px solid #333;padding-top:4px;margin-top:4px;">' + (cfg.namaPemilik || '( ......................... )') + '</div>'
+        + '    </div>'
+        + '  </div>'
+        + '</div>';
+    return html;
+}
+
+function previewLaporan() {
+    var html = buildLaporanDocument();
+    if (!html) { showToast('Pilih dan tunggu laporan selesai dimuat terlebih dahulu', 'warning'); return; }
+    document.getElementById('preview-modal-content').innerHTML = html;
+    document.getElementById('preview-modal').classList.remove('hidden');
+}
+
+function closePreviewModal() {
+    document.getElementById('preview-modal').classList.add('hidden');
+}
+
+function printFromPreview() {
+    var content = document.getElementById('preview-modal-content');
+    if (!content || !content.innerHTML.trim()) { showToast('Tidak ada laporan untuk dicetak', 'warning'); return; }
+    var printArea = document.getElementById('print-area');
+    printArea.innerHTML = content.innerHTML;
+    window.print();
+}
+
+function downloadLaporanPDF() {
+    var html = buildLaporanDocument();
+    if (!html) { showToast('Pilih dan tunggu laporan selesai dimuat terlebih dahulu', 'warning'); return; }
+    if (typeof html2pdf === 'undefined') { showToast('Modul PDF belum termuat, cek koneksi internet', 'error'); return; }
+
+    var wrapper = document.createElement('div');
+    wrapper.style.width = '210mm';
+    wrapper.innerHTML = html;
+    document.body.appendChild(wrapper);
+
+    showToast('Menyiapkan file PDF...', 'info');
+    var opt = {
+        margin: 8,
+        filename: 'Laporan_Kopitro_' + currentLaporanJenis + '_' + Date.now() + '.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(wrapper).save().then(function() {
+        document.body.removeChild(wrapper);
+        showToast('PDF berhasil diunduh', 'success');
+    }).catch(function() {
+        document.body.removeChild(wrapper);
+        showToast('Gagal membuat PDF', 'error');
+    });
+}
+
+/* ===== INIT ===== */
+document.addEventListener('DOMContentLoaded', function() {
+    checkSession();
+});
+</script>
+</body>
+</html>
