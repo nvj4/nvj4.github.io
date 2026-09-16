@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Klinik ABC</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<style>
+:root {
+  --navy: #0a2540;
+  --teal: #00b8a2;
+  --teal-light: #e0f7f5;
+  --cream: #faf8f5;
+  --text: #1a2e40;
+  --muted: #6b7e90;
+  --border: rgba(10,37,64,0.1);
+  --card-r: 20px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  overflow-x: hidden;
+  padding-top: 76px;
+}
+
+h1,h2,h3 { font-family: 'DM Serif Display', serif; }
+
+/* ── NAVBAR ── */
+.navbar {
+  background: rgba(250,248,245,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
+  transition: box-shadow .3s;
+}
+.navbar.scrolled { box-shadow: 0 4px 24px rgba(10,37,64,0.08); }
+.navbar-brand { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--navy) !important; letter-spacing: -0.5px; }
+.nav-link { color: var(--text) !important; font-weight: 500; font-size: .92rem; padding: 6px 14px !important; border-radius: 50px; transition: background .2s; }
+.nav-link:hover { background: var(--teal-light); color: var(--teal) !important; }
+.btn-book-nav {
+  background: var(--navy);
+  color: #fff !important;
+  padding: 10px 24px !important;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: .88rem;
+  transition: all .25s;
+  letter-spacing: .3px;
+}
+.btn-book-nav:hover { background: var(--teal); transform: translateY(-1px); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 88vh;
+  display: flex;
+  align-items: center;
+  background: var(--cream);
+  position: relative;
+  overflow: hidden;
+  padding: 80px 0 60px;
+}
+.hero-bg-circle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.hero-bg-circle.c1 {
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(0,184,162,0.12) 0%, transparent 70%);
+  top: -150px; right: -100px;
+}
+.hero-bg-circle.c2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(10,37,64,0.05) 0%, transparent 70%);
+  bottom: -100px; left: -80px;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--teal-light); color: var(--teal);
+  padding: 6px 16px; border-radius: 50px;
+  font-size: .82rem; font-weight: 600;
+  margin-bottom: 24px;
+  border: 1px solid rgba(0,184,162,0.2);
+  animation: fadeUp .6s ease both;
+}
+.hero h1 {
+  font-size: clamp(2.8rem, 5vw, 4.2rem);
+  line-height: 1.1;
+  color: var(--navy);
+  margin-bottom: 20px;
+  animation: fadeUp .6s .1s ease both;
+}
+.hero h1 em { color: var(--teal); font-style: italic; }
+.hero p.lead {
+  font-size: 1.05rem; color: var(--muted); line-height: 1.7;
+  max-width: 460px; margin-bottom: 36px;
+  animation: fadeUp .6s .2s ease both;
+}
+.hero-cta { animation: fadeUp .6s .3s ease both; }
+.btn-primary-cta {
+  background: var(--navy); color: #fff;
+  padding: 14px 32px; border-radius: 50px;
+  font-weight: 600; font-size: .95rem;
+  border: none; transition: all .25s;
+  text-decoration: none; display: inline-block;
+}
+.btn-primary-cta:hover { background: var(--teal); color: #fff; transform: translateY(-2px); }
+.btn-outline-cta {
+  background: transparent; color: var(--navy);
+  padding: 14px 32px; border-radius: 50px;
+  font-weight: 600; font-size: .95rem;
+  border: 1.5px solid var(--border);
+  transition: all .25s; text-decoration: none; display: inline-block;
+}
+.btn-outline-cta:hover { border-color: var(--teal); color: var(--teal); }
+
+/* Hero image card */
+.hero-img-wrap {
+  position: relative;
+  animation: fadeUp .7s .15s ease both;
+}
+.hero-img-main {
+  width: 100%; border-radius: 28px;
+  object-fit: cover; height: 520px;
+  box-shadow: 0 32px 64px rgba(10,37,64,0.15);
+}
+.hero-floating-card {
+  position: absolute;
+  background: #fff;
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: 0 16px 40px rgba(10,37,64,0.12);
+  border: 1px solid rgba(255,255,255,.8);
+  animation: float 4s ease-in-out infinite;
+}
+.hero-floating-card.fc1 { bottom: 40px; left: -30px; }
+.hero-floating-card.fc2 { top: 40px; right: -20px; }
+.fc-label { font-size: .72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+.fc-value { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--navy); }
+.fc-sub { font-size: .78rem; color: var(--muted); }
+.fc-icon { width: 36px; height: 36px; background: var(--teal-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--teal); font-size: 1rem; margin-bottom: 8px; }
+
+/* ── STATS ── */
+.stats-section {
+  background: var(--navy);
+  padding: 56px 0;
+}
+.stat-item { text-align: center; padding: 10px; }
+.stat-num { font-family: 'DM Serif Display', serif; font-size: 2.8rem; color: #fff; line-height: 1; }
+.stat-num span { color: var(--teal); }
+.stat-desc { font-size: .88rem; color: rgba(255,255,255,0.55); margin-top: 6px; }
+.stat-divider { width: 1px; background: rgba(255,255,255,0.12); align-self: stretch; margin: 10px 0; }
+
+/* ── SECTIONS ── */
+.section { padding: 96px 0; }
+.section-alt { background: #fff; }
+.section-label {
+  font-size: .78rem; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--teal); margin-bottom: 12px;
+}
+.section-title { font-size: clamp(2rem, 3.5vw, 2.8rem); color: var(--navy); line-height: 1.2; margin-bottom: 16px; }
+.section-desc { color: var(--muted); font-size: 1rem; max-width: 520px; margin: 0 auto; line-height: 1.7; }
+
+/* ── SERVICE CARDS ── */
+.service-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 36px 28px;
+  height: 100%;
+  transition: all .3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.service-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--teal), #00d4bc);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .3s ease;
+}
+.service-card:hover { transform: translateY(-6px); box-shadow: 0 20px 48px rgba(10,37,64,0.1); border-color: transparent; }
+.service-card:hover::after { transform: scaleX(1); }
+.svc-icon {
+  width: 56px; height: 56px;
+  background: var(--teal-light);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; color: var(--teal);
+  margin-bottom: 22px;
+  transition: all .3s;
+}
+.service-card:hover .svc-icon { background: var(--teal); color: #fff; }
+.service-card h4 { font-family: 'DM Serif Display', serif; font-size: 1.2rem; color: var(--navy); margin-bottom: 10px; }
+.service-card p { font-size: .9rem; color: var(--muted); line-height: 1.6; }
+.svc-tag { display: inline-block; font-size: .72rem; font-weight: 600; color: var(--teal); background: var(--teal-light); padding: 3px 10px; border-radius: 50px; margin-top: 14px; }
+
+/* ── SCHEDULE TABLE ── */
+.schedule-wrap {
+  background: #fff;
+  border-radius: var(--card-r);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.schedule-table { width: 100%; border-collapse: collapse; }
+.schedule-table th { background: var(--navy); color: #fff; padding: 14px 20px; font-size: .82rem; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+.schedule-table td { padding: 14px 20px; font-size: .88rem; border-bottom: 1px solid var(--border); }
+.schedule-table tr:last-child td { border-bottom: none; }
+.schedule-table tr:nth-child(even) td { background: var(--cream); }
+.badge-avail { background: #e6f9e7; color: #1a7f2c; font-size: .72rem; padding: 3px 10px; border-radius: 50px; font-weight: 600; }
+.badge-full { background: #ffeaea; color: #c0392b; font-size: .72rem; padding: 3px 10px; border-radius: 50px; font-weight: 600; }
+
+/* ── DOCTOR CARDS ── */
+.doctor-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 32px 24px;
+  text-align: center;
+  height: 100%;
+  transition: all .3s;
+  position: relative;
+}
+.doctor-card:hover { transform: translateY(-6px); box-shadow: 0 20px 48px rgba(10,37,64,0.1); }
+.doc-img-wrap { position: relative; display: inline-block; margin-bottom: 18px; }
+.doc-img {
+  width: 110px; height: 110px;
+  border-radius: 50%; object-fit: cover;
+  border: 4px solid var(--cream);
+  box-shadow: 0 8px 24px rgba(10,37,64,0.12);
+}
+.doc-badge {
+  position: absolute;
+  bottom: 4px; right: 0;
+  width: 22px; height: 22px;
+  background: #2ecc71;
+  border: 3px solid #fff;
+  border-radius: 50%;
+}
+.doctor-card h4 { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--navy); margin-bottom: 4px; }
+.doc-spec { font-size: .8rem; font-weight: 600; color: var(--teal); margin-bottom: 12px; }
+.doc-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 16px; }
+.doc-tag { font-size: .72rem; background: var(--cream); color: var(--muted); padding: 3px 10px; border-radius: 50px; border: 1px solid var(--border); }
+.btn-appt {
+  background: transparent; color: var(--navy);
+  border: 1.5px solid var(--border); border-radius: 50px;
+  padding: 8px 22px; font-size: .82rem; font-weight: 600;
+  transition: all .25s; cursor: pointer;
+}
+.btn-appt:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+/* ── TESTIMONIALS ── */
+.testi-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--card-r);
+  padding: 28px;
+  height: 100%;
+  transition: all .3s;
+}
+.testi-card:hover { box-shadow: 0 16px 40px rgba(10,37,64,0.08); }
+.stars { color: #f5a623; font-size: .9rem; margin-bottom: 14px; letter-spacing: 2px; }
+.testi-text { font-size: .92rem; color: var(--text); line-height: 1.7; margin-bottom: 20px; font-style: italic; }
+.testi-author { display: flex; align-items: center; gap: 10px; }
+.testi-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--teal-light); display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--teal); font-size: .9rem; }
+.testi-name { font-weight: 600; font-size: .88rem; color: var(--navy); }
+.testi-sub { font-size: .78rem; color: var(--muted); }
+
+/* ── WHY US ── */
+.why-icon { width: 48px; height: 48px; background: var(--teal-light); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--teal); font-size: 1.2rem; flex-shrink: 0; }
+.why-item { display: flex; gap: 16px; align-items: flex-start; padding: 20px; border-radius: 16px; transition: background .2s; }
+.why-item:hover { background: #fff; }
+.why-item h5 { font-family: 'DM Serif Display', serif; font-size: 1rem; color: var(--navy); margin-bottom: 4px; }
+.why-item p { font-size: .86rem; color: var(--muted); line-height: 1.6; }
+
+/* ── MODAL ── */
+.modal-content { border-radius: 24px; border: none; box-shadow: 0 40px 80px rgba(10,37,64,0.2); overflow: hidden; }
+.modal-header { background: var(--navy); padding: 24px 28px; border: none; }
+.modal-title { color: #fff; font-family: 'DM Serif Display', serif; font-size: 1.4rem; }
+.modal-header .btn-close { filter: invert(1); opacity: .7; }
+.modal-body { padding: 28px; background: var(--cream); }
+.form-label { font-size: .82rem; font-weight: 600; color: var(--navy); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+.form-control, .form-select {
+  padding: 12px 16px; border-radius: 12px;
+  border: 1.5px solid var(--border); background: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .92rem; color: var(--text);
+  transition: all .2s;
+}
+.form-control:focus, .form-select:focus {
+  background: #fff; border-color: var(--teal);
+  box-shadow: 0 0 0 4px rgba(0,184,162,0.12); outline: none;
+}
+.btn-submit {
+  background: var(--navy); color: #fff;
+  padding: 14px; border-radius: 12px;
+  font-weight: 600; border: none; width: 100%;
+  font-family: 'DM Sans', sans-serif; font-size: .95rem;
+  transition: all .25s; cursor: pointer;
+}
+.btn-submit:hover { background: var(--teal); transform: translateY(-1px); }
+.form-group-label { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+
+/* Success modal */
+.success-icon-wrap { width: 72px; height: 72px; background: #e6f9e7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 2rem; color: #2ecc71; }
+.summary-box { background: #fff; border-radius: 14px; padding: 18px; border: 1px solid var(--border); margin: 16px 0; text-align: left; }
+.summary-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; font-size: .88rem; border-bottom: 1px dashed var(--border); }
+.summary-row:last-child { border: none; }
+.summary-row .key { color: var(--muted); }
+.summary-row .val { font-weight: 600; color: var(--navy); }
+.btn-wa { background: #25d366; color: #fff; border: none; border-radius: 12px; width: 100%; padding: 12px; font-weight: 600; font-family: 'DM Sans', sans-serif; font-size: .92rem; transition: all .25s; text-decoration: none; display: block; text-align: center; margin-bottom: 8px; }
+.btn-wa:hover { background: #1ebe5d; color: #fff; }
+.btn-close-modal { background: transparent; color: var(--muted); border: 1.5px solid var(--border); border-radius: 12px; width: 100%; padding: 10px; font-weight: 600; font-family: 'DM Sans', sans-serif; font-size: .88rem; transition: all .25s; cursor: pointer; }
+.btn-close-modal:hover { border-color: var(--navy); color: var(--navy); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--navy);
+  padding: 64px 0 32px;
+  color: rgba(255,255,255,0.55);
+}
+footer .brand { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: #fff; margin-bottom: 10px; }
+footer p { font-size: .88rem; line-height: 1.7; }
+footer h6 { color: rgba(255,255,255,.8); font-size: .78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; }
+footer a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: .88rem; display: block; margin-bottom: 8px; transition: color .2s; }
+footer a:hover { color: var(--teal); }
+.footer-divider { border-color: rgba(255,255,255,0.1); margin: 40px 0 24px; }
+.footer-bottom { font-size: .8rem; }
+.social-btn { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.08); display: inline-flex; align-items: center; justify-content: center; color: rgba(255,255,255,.6); font-size: 1rem; transition: all .2s; text-decoration: none; margin-right: 8px; }
+.social-btn:hover { background: var(--teal); color: #fff; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px) {
+  .hero h1 { font-size: 2.4rem; }
+  .hero-img-main { height: 300px; }
+  .hero-floating-card.fc1 { left: 10px; }
+  .hero-floating-card.fc2 { right: 10px; }
+  .stat-divider { display: none; }
+}
+
+/* Style untuk Bubble Chat */
+
+
+
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand" href="#">
+      <i class="bi bi-heart-pulse-fill me-2" style="color:var(--teal)"></i>Klinik<span style="color:var(--teal)">ABC</span>
+    </a>
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav align-items-center gap-1">
+        <li class="nav-item"><a class="nav-link" href="#beranda">Beranda</a></li>
+        <li class="nav-item"><a class="nav-link" href="#layanan">Layanan</a></li>
+        <li class="nav-item"><a class="nav-link" href="#jadwal">Jadwal</a></li>
+        <li class="nav-item"><a class="nav-link" href="#dokter">Dokter</a></li>
+        <li class="nav-item"><a class="nav-link" href="#testimoni">Testimoni</a></li>
+        <li class="nav-item ms-2">
+          <button class="btn-book-nav" data-bs-toggle="modal" data-bs-target="#bookingModal">
+            <i class="bi bi-calendar2-check me-2"></i>Booking
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="beranda" class="hero">
+  <div class="hero-bg-circle c1"></div>
+  <div class="hero-bg-circle c2"></div>
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div class="hero-badge"><i class="bi bi-shield-fill-check"></i> Terpercaya Sejak 2020</div>
+        <h1>Kesehatan Anda,<br><em>Prioritas Kami.</em></h1>
+        <p class="lead">Klinik ABC menghadirkan pelayanan medis terpadu dengan teknologi terkini dan dokter spesialis berpengalaman — karena setiap pasien berhak mendapat yang terbaik.</p>
+        <div class="hero-cta d-flex flex-wrap gap-3">
+          <button class="btn-primary-cta" data-bs-toggle="modal" data-bs-target="#bookingModal">
+            <i class="bi bi-calendar2-check me-2"></i>Booking Sekarang
+          </button>
+          <a href="#layanan" class="btn-outline-cta">Lihat Layanan</a>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="hero-img-wrap">
+          <img src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Tim Dokter Klinik ABC" class="hero-img-main">
+          <div class="hero-floating-card fc1">
+            <div class="fc-icon"><i class="bi bi-person-check"></i></div>
+            <div class="fc-label">Pasien Hari Ini</div>
+            <div class="fc-value">48<span style="color:var(--teal);font-size:1rem">+</span></div>
+            <div class="fc-sub">Tersisa 5 slot booking</div>
+          </div>
+          <div class="hero-floating-card fc2">
+            <div class="fc-icon"><i class="bi bi-star-fill"></i></div>
+            <div class="fc-label">Rating Kepuasan</div>
+            <div class="fc-value">4.9</div>
+            <div class="fc-sub">dari 1.200+ ulasan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section">
+  <div class="container">
+    <div class="row text-center justify-content-center align-items-center g-0">
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <div class="stat-num">12<span>K+</span></div>
+          <div class="stat-desc">Pasien Ditangani</div>
+        </div>
+      </div>
+      <div class="col-auto d-none d-md-block"><div class="stat-divider" style="height:60px"></div></div>
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <div class="stat-num">15<span>+</span></div>
+          <div class="stat-desc">Dokter Spesialis</div>
+        </div>
+      </div>
+      <div class="col-auto d-none d-md-block"><div class="stat-divider" style="height:60px"></div></div>
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <div class="stat-num">4<span>th</span></div>
+          <div class="stat-desc">Tahun Beroperasi</div>
+        </div>
+      </div>
+      <div class="col-auto d-none d-md-block"><div class="stat-divider" style="height:60px"></div></div>
+      <div class="col-6 col-md-3">
+        <div class="stat-item">
+          <div class="stat-num">98<span>%</span></div>
+          <div class="stat-desc">Tingkat Kepuasan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LAYANAN -->
+<section id="layanan" class="section section-alt">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <div class="section-label">Layanan Kami</div>
+      <h2 class="section-title">Solusi Kesehatan Terlengkap</h2>
+      <p class="section-desc">Kami menyediakan berbagai layanan medis profesional untuk memenuhi kebutuhan kesehatan seluruh keluarga Anda.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4 reveal">
+        <div class="service-card">
+          <div class="svc-icon"><i class="bi bi-clipboard2-pulse"></i></div>
+          <h4>Poli Umum & Penyakit Dalam</h4>
+          <p>Pemeriksaan kesehatan menyeluruh, diagnosa akurat, dan penanganan berbagai penyakit umum oleh dokter berpengalaman.</p>
+          <span class="svc-tag">Buka Setiap Hari</span>
+        </div>
+      </div>
+      <div class="col-md-4 reveal">
+        <div class="service-card">
+          <div class="svc-icon"><i class="bi bi-tooth"></i></div>
+          <h4>Poli Gigi & Estetika</h4>
+          <p>Perawatan gigi komprehensif mulai dari pembersihan karang gigi, tambal gigi, hingga estetika senyum dan bleaching.</p>
+          <span class="svc-tag">Senin–Sabtu</span>
+        </div>
+      </div>
+      <div class="col-md-4 reveal">
+        <div class="service-card">
+          <div class="svc-icon"><i class="bi bi-people"></i></div>
+          <h4>Poli Anak (Pediatri)</h4>
+          <p>Pelayanan kesehatan anak dari bayi hingga remaja, termasuk imunisasi, tumbuh kembang, dan konsultasi nutrisi.</p>
+          <span class="svc-tag">Senin–Jumat</span>
+        </div>
+      </div>
+      <div class="col-md-4 reveal">
+        <div class="service-card">
+          <div class="svc-icon"><i class="bi bi-activity"></i></div>
+          <h4>Laboratorium Klinik</h4>
+          <p>Pemeriksaan lab lengkap dengan hasil akurat dan cepat. Darah rutin, gula darah, kolesterol, dan lebih banyak lagi.</p>
+          <span class="svc-tag">Hasil Cepat 2 Jam</span>
+        </div>
+      </div>
+      <div class="col-md-4 reveal">
+        <div class="service-card">
+          <div class="svc-icon"><i class="bi bi-camera-video"></i></div>
+          <h4>Konsultasi Online</h4>
+          <p>Konsultasi dengan dokter kami dari kenyamanan rumah Anda melalui video call. Mudah, cepat, dan terjangkau.</p>
+          <span class="svc-tag">24 Jam</span>
+        </div>
+      </div>
+      <div class="col-md-4 reveal">
+        <div class="service-card">
+          <div class="svc-icon"><i class="bi bi-heart-pulse"></i></div>
+          <h4>Medical Check-Up</h4>
+          <p>Paket pemeriksaan kesehatan menyeluruh untuk karyawan dan individu. Tersedia berbagai paket sesuai kebutuhan.</p>
+          <span class="svc-tag">Paket Tersedia</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JADWAL PRAKTEK -->
+<section id="jadwal" class="section" style="background:var(--cream)">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-5 reveal">
+        <div class="section-label">Jadwal Praktek</div>
+        <h2 class="section-title">Temukan Waktu yang Tepat untuk Anda</h2>
+        <p style="color:var(--muted);font-size:.95rem;line-height:1.7;margin-bottom:24px">
+          Kami beroperasi 6 hari seminggu dengan berbagai sesi untuk memastikan Anda bisa mendapatkan layanan kapan pun dibutuhkan.
+        </p>
+        <div class="why-item" style="padding:0;margin-bottom:16px">
+          <div class="why-icon"><i class="bi bi-clock"></i></div>
+          <div>
+            <h5>Jam Operasional</h5>
+            <p>Senin–Sabtu: 08.00–20.00 WIB<br>Minggu: 09.00–15.00 WIB (Darurat)</p>
+          </div>
+        </div>
+        <div class="why-item" style="padding:0">
+          <div class="why-icon"><i class="bi bi-telephone"></i></div>
+          <div>
+            <h5>Hotline 24 Jam</h5>
+            <p>(021) 1234-5678 untuk konsultasi darurat</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7 reveal">
+        <div class="schedule-wrap">
+          <table class="schedule-table">
+            <thead>
+              <tr>
+                <th>Dokter</th>
+                <th>Spesialisasi</th>
+                <th>Hari</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>dr. Andi, Sp.PD</strong></td>
+                <td>Penyakit Dalam</td>
+                <td>Senin–Jumat</td>
+                <td><span class="badge-avail">Tersedia</span></td>
+              </tr>
+              <tr>
+                <td><strong>drg. Budi, Sp.KG</strong></td>
+                <td>Gigi & Mulut</td>
+                <td>Senin–Sabtu</td>
+                <td><span class="badge-avail">Tersedia</span></td>
+              </tr>
+              <tr>
+                <td><strong>dr. Citra, Sp.A</strong></td>
+                <td>Anak / Pediatri</td>
+                <td>Selasa–Sabtu</td>
+                <td><span class="badge-avail">Tersedia</span></td>
+              </tr>
+              <tr>
+                <td><strong>dr. Dian, Sp.OG</strong></td>
+                <td>Kandungan</td>
+                <td>Senin, Rabu, Jumat</td>
+                <td><span class="badge-full">Penuh Hari Ini</span></td>
+              </tr>
+              <tr>
+                <td><strong>dr. Eko</strong></td>
+                <td>Dokter Umum</td>
+                <td>Setiap Hari</td>
+                <td><span class="badge-avail">Tersedia</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOKTER -->
+<section id="dokter" class="section section-alt">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <div class="section-label">Tim Medis</div>
+      <h2 class="section-title">Dokter Spesialis Kami</h2>
+      <p class="section-desc">Didukung oleh tenaga medis bersertifikasi dengan pengalaman bertahun-tahun di bidangnya.</p>
+    </div>
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4 col-sm-6 reveal">
+        <div class="doctor-card">
+          <div class="doc-img-wrap">
+            <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="doc-img" alt="dr. Andi">
+            <div class="doc-badge"></div>
+          </div>
+          <h4>dr. Andi, Sp.PD</h4>
+          <div class="doc-spec">Spesialis Penyakit Dalam</div>
+          <div class="doc-tags">
+            <span class="doc-tag">Diabetes</span>
+            <span class="doc-tag">Hipertensi</span>
+            <span class="doc-tag">Jantung</span>
+          </div>
+          <button class="btn-appt" data-bs-toggle="modal" data-bs-target="#bookingModal" onclick="selectDoctor('dr. Andi, Sp.PD')">Buat Janji Temu</button>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-6 reveal">
+        <div class="doctor-card">
+          <div class="doc-img-wrap">
+            <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="doc-img" alt="drg. Budi">
+            <div class="doc-badge"></div>
+          </div>
+          <h4>drg. Budi, Sp.KG</h4>
+          <div class="doc-spec">Spesialis Gigi & Mulut</div>
+          <div class="doc-tags">
+            <span class="doc-tag">Orthodonti</span>
+            <span class="doc-tag">Estetika</span>
+            <span class="doc-tag">Bedah</span>
+          </div>
+          <button class="btn-appt" data-bs-toggle="modal" data-bs-target="#bookingModal" onclick="selectDoctor('drg. Budi, Sp.KG')">Buat Janji Temu</button>
+        </div>
+      </div>
+      <div class="col-md-4 col-sm-6 reveal">
+        <div class="doctor-card">
+          <div class="doc-img-wrap">
+            <img src="https://images.unsplash.com/photo-1559839734-2b71ea86d67a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="doc-img" alt="dr. Citra">
+            <div class="doc-badge"></div>
+          </div>
+          <h4>dr. Citra, Sp.A</h4>
+          <div class="doc-spec">Spesialis Anak</div>
+          <div class="doc-tags">
+            <span class="doc-tag">Imunisasi</span>
+            <span class="doc-tag">Tumbuh Kembang</span>
+            <span class="doc-tag">Nutrisi</span>
+          </div>
+          <button class="btn-appt" data-bs-toggle="modal" data-bs-target="#bookingModal" onclick="selectDoctor('dr. Citra, Sp.A')">Buat Janji Temu</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY US -->
+<section class="section" style="background:var(--cream)">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-5 reveal">
+        <div class="section-label">Mengapa Kami</div>
+        <h2 class="section-title">Standar Pelayanan yang Berbeda</h2>
+        <p style="color:var(--muted);font-size:.95rem;line-height:1.7">Kami tidak sekadar merawat penyakit — kami membangun kepercayaan, kenyamanan, dan hubungan jangka panjang dengan setiap pasien.</p>
+      </div>
+      <div class="col-lg-7">
+        <div class="row g-3">
+          <div class="col-12 reveal"><div class="why-item"><div class="why-icon"><i class="bi bi-shield-check"></i></div><div><h5>Dokter Tersertifikasi IDI</h5><p>Seluruh dokter kami terdaftar resmi di Ikatan Dokter Indonesia dengan kompetensi terverifikasi.</p></div></div></div>
+          <div class="col-12 reveal"><div class="why-item"><div class="why-icon"><i class="bi bi-lightning"></i></div><div><h5>Proses Booking Cepat</h5><p>Booking online dalam 60 detik. Tidak perlu antre panjang — konfirmasi langsung via WhatsApp.</p></div></div></div>
+          <div class="col-12 reveal"><div class="why-item"><div class="why-icon"><i class="bi bi-building"></i></div><div><h5>Fasilitas Modern</h5><p>Peralatan medis terkini, ruang steril berstandar internasional, dan lingkungan yang nyaman.</p></div></div></div>
+          <div class="col-12 reveal"><div class="why-item"><div class="why-icon"><i class="bi bi-lock"></i></div><div><h5>Kerahasiaan Data Terjamin</h5><p>Data medis Anda dilindungi sesuai regulasi kesehatan dan tidak akan dibagikan ke pihak ketiga.</p></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONI -->
+<section id="testimoni" class="section section-alt">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <div class="section-label">Testimoni</div>
+      <h2 class="section-title">Kata Mereka tentang Kami</h2>
+      <p class="section-desc">Kepercayaan ribuan pasien adalah kebanggaan terbesar kami.</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4 reveal">
+        <div class="testi-card">
+          <div class="stars">★★★★★</div>
+          <p class="testi-text">"Pelayanannya luar biasa! Dokternya ramah dan sabar menjelaskan kondisi saya. Fasilitas bersih dan modern. Pasti akan kembali lagi."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">SR</div>
+            <div><div class="testi-name">Siti Rahmawati</div><div class="testi-sub">Pasien Poli Umum</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 reveal">
+        <div class="testi-card">
+          <div class="stars">★★★★★</div>
+          <p class="testi-text">"Booking online-nya gampang banget. Tidak perlu antre lama, langsung dipanggil sesuai jadwal. drg. Budi juga sangat profesional."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">AP</div>
+            <div><div class="testi-name">Ahmad Pratama</div><div class="testi-sub">Pasien Poli Gigi</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 reveal">
+        <div class="testi-card">
+          <div class="stars">★★★★★</div>
+          <p class="testi-text">"Anak saya selalu takut ke dokter, tapi dr. Citra sangat sabar dan menyenangkan. Anak saya sekarang tidak takut lagi periksa ke sini."</p>
+          <div class="testi-author">
+            <div class="testi-avatar">DK</div>
+            <div><div class="testi-name">Dewi Kusuma</div><div class="testi-sub">Orang Tua Pasien Anak</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section style="background:var(--teal);padding:64px 0;">
+  <div class="container text-center reveal">
+    <h2 style="font-family:'DM Serif Display',serif;color:#fff;font-size:2.2rem;margin-bottom:12px">Siap Menjaga Kesehatan Anda?</h2>
+    <p style="color:rgba(255,255,255,0.8);margin-bottom:28px;font-size:.98rem">Jangan tunda kesehatan Anda. Buat janji sekarang dan dapatkan konsultasi pertama Anda.</p>
+    <button class="btn-primary-cta" style="background:#fff;color:var(--teal)" data-bs-toggle="modal" data-bs-target="#bookingModal">
+      <i class="bi bi-calendar2-check me-2"></i>Booking Gratis Sekarang
+    </button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-4">
+        <div class="brand"><i class="bi bi-heart-pulse-fill me-2" style="color:var(--teal)"></i>KlinikABC</div>
+        <p style="margin-bottom:20px">Melayani dengan sepenuh hati sejak 2020. Kesehatan Anda adalah misi kami.</p>
+        <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="social-btn"><i class="bi bi-whatsapp"></i></a>
+      </div>
+      <div class="col-6 col-md-2">
+        <h6>Navigasi</h6>
+        <a href="#beranda">Beranda</a>
+        <a href="#layanan">Layanan</a>
+        <a href="#jadwal">Jadwal</a>
+        <a href="#dokter">Dokter</a>
+        <a href="#testimoni">Testimoni</a>
+      </div>
+      <div class="col-6 col-md-2">
+        <h6>Layanan</h6>
+        <a href="#">Poli Umum</a>
+        <a href="#">Poli Gigi</a>
+        <a href="#">Poli Anak</a>
+        <a href="#">Laboratorium</a>
+        <a href="#">Medical Check-Up</a>
+      </div>
+      <div class="col-md-4">
+        <h6>Kontak & Lokasi</h6>
+        <p style="font-size:.86rem;line-height:1.8">
+          <i class="bi bi-geo-alt-fill me-2" style="color:var(--teal)"></i>Jl. Kesehatan No. 123, Jakarta Selatan<br>
+          <i class="bi bi-telephone-fill me-2" style="color:var(--teal)"></i>(021) 1234-5678<br>
+          <i class="bi bi-envelope-fill me-2" style="color:var(--teal)"></i>info@klinikabc.id<br>
+          <i class="bi bi-clock-fill me-2" style="color:var(--teal)"></i>Senin–Sabtu: 08.00–20.00 WIB
+        </p>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="footer-bottom d-flex flex-wrap justify-content-between gap-2">
+      <span>&copy; 2024 Klinik ABC. All Rights Reserved.</span>
+      <span>Dibuat dengan <i class="bi bi-heart-fill" style="color:var(--teal)"></i> untuk kesehatan Anda</span>
+    </div>
+  </div>
+</footer>
+
+<!-- MODAL BOOKING -->
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title">Booking Dokter Online</h5>
+          <p style="color:rgba(255,255,255,.55);font-size:.82rem;margin:0">Isi formulir di bawah ini untuk membuat janji temu</p>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="bookingForm" action="proses.php" method="POST">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nama Lengkap</label>
+              <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama lengkap" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">No. WhatsApp</label>
+              <input type="tel" class="form-control" id="no_hp" name="no_hp" placeholder="08xxxxxxxxxx" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Pilih Dokter / Poli</label>
+              <select class="form-select" id="id_dokter" name="id_dokter" required>
+                <option value="" selected disabled>— Pilih Dokter atau Poli —</option>
+                <optgroup label="Dokter Spesialis">
+                  <option value="dr. Andi, Sp.PD">dr. Andi, Sp.PD — Penyakit Dalam</option>
+                  <option value="drg. Budi, Sp.KG">drg. Budi, Sp.KG — Gigi & Mulut</option>
+                  <option value="dr. Citra, Sp.A">dr. Citra, Sp.A — Anak / Pediatri</option>
+                  <option value="dr. Dian, Sp.OG">dr. Dian, Sp.OG — Kandungan</option>
+                </optgroup>
+                <optgroup label="Poli Umum">
+                  <option value="Poli Umum">Poli Umum — Dokter Jaga</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Tanggal Kunjungan</label>
+              <input type="date" class="form-control" id="tanggal" name="tanggal" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Pilih Sesi</label>
+              <select class="form-select" id="jam" name="jam" required>
+                <option value="" selected disabled>— Pilih Waktu —</option>
+                <optgroup label="Sesi Pagi">
+                  <option value="09:00">09:00 WIB</option>
+                  <option value="10:00">10:00 WIB</option>
+                  <option value="11:00">11:00 WIB</option>
+                </optgroup>
+                <optgroup label="Sesi Siang">
+                  <option value="13:00">13:00 WIB</option>
+                  <option value="14:00">14:00 WIB</option>
+                  <option value="15:00">15:00 WIB</option>
+                </optgroup>
+                <optgroup label="Sesi Sore">
+                  <option value="16:00">16:00 WIB</option>
+                  <option value="17:00">17:00 WIB</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Keluhan / Catatan (Opsional)</label>
+             <textarea class="form-control" name="keluhan" rows="2" placeholder="Ceritakan singkat keluhan Anda..."></textarea>
+            </div>
+          </div>
+          <div class="mt-4">
+            <button type="submit" class="btn-submit" id="btnSubmit">
+              <span id="btnText"><i class="bi bi-send me-2"></i>Kirim Booking</span>
+              <div id="btnLoader" class="spinner-border spinner-border-sm d-none" role="status"></div>
+            </button>
+          </div>
+          <p style="text-align:center;font-size:.78rem;color:var(--muted);margin-top:12px">
+            <i class="bi bi-shield-check me-1"></i>Data Anda aman dan tidak akan disalahgunakan
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SUKSES -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:24px;overflow:hidden">
+      <div class="modal-body" style="padding:36px;background:var(--cream);text-align:center">
+        <div class="success-icon-wrap"><i class="bi bi-check-lg"></i></div>
+        <h3 style="font-family:'DM Serif Display',serif;color:var(--navy);margin-bottom:6px">Booking Berhasil!</h3>
+        <p style="color:var(--muted);font-size:.88rem;margin-bottom:0">Konfirmasi akan dikirim ke WhatsApp Anda segera.</p>
+        <div class="summary-box">
+          <div class="summary-row"><span class="key">Nama</span><span class="val" id="modalNama">-</span></div>
+          <div class="summary-row"><span class="key">Dokter</span><span class="val" id="modalDokter">-</span></div>
+          <div class="summary-row"><span class="key">Jadwal</span><span class="val" id="modalWaktu">-</span></div>
+          <div class="summary-row"><span class="key">No. Antrian</span><span class="val" id="modalAntrian" style="color:var(--teal)">-</span></div>
+        </div>
+        <a id="waLink" href="#" target="_blank" class="btn-wa"><i class="bi bi-whatsapp me-2"></i>Konfirmasi via WhatsApp</a>
+        <button type="button" class="btn-close-modal" data-bs-dismiss="modal">Tutup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<link
+  href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css"
+  rel="stylesheet"
+/>
+
+<div id="n8n-chat"></div>
+
+<script type="module">
+import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+createChat({
+    webhookUrl: 'http://localhost:5678/webhook/19a4bd01-5be2-406f-a04b-739a290b752b/chat',
+
+    target: '#n8n-chat',
+
+    showWelcomeScreen: false,
+
+    initialMessages: [
+        'Selamat datang di Klinik ABC! 👋. Ada yang bisa kami bantu mengenai jadwal dokter atau layanan kami?',
+    ],
+
+    i18n: {
+        en: {
+            title: '🤖',
+            subtitle: 'Customer Service',
+            getStarted:'Mulai chat'
+        }
+    }
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Navbar scroll effect
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Set min date
+document.getElementById('tanggal').min = new Date().toISOString().split('T')[0];
+
+// Auto select doctor
+function selectDoctor(nama) {
+  const sel = document.getElementById('id_dokter');
+  for(let i=0; i<sel.options.length; i++) {
+    if(sel.options[i].value.includes(nama.split(',')[0])) { sel.selectedIndex = i; break; }
+  }
+}
+
+// Form submit
+ document.getElementById('bookingForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnSubmit');
+  const btnText = document.getElementById('btnText');
+  const btnLoader = document.getElementById('btnLoader');
+  const fd = new FormData(this);
+  const nama = fd.get('nama');
+  const dokter = fd.get('id_dokter');
+  const tanggal = fd.get('tanggal');
+  const jam = fd.get('jam');
+
+  btn.disabled = true;
+  btnText.innerHTML = 'Mengirim...';
+  btnLoader.classList.remove('d-none');
+
+  // Simulate or send to proses.php
+ const sendData = () => {
+  return fetch('proses.php', {
+    method: 'POST',
+    body: fd
+  })
+  .then(res => res.text())
+  .then(data => {
+    console.log("Response PHP:", data);
+
+    if (data.includes("Gagal") || data.includes("Error")) {
+      throw new Error("Server error");
+    }
+
+    return data;
+  })
+  .catch(err => {
+    console.error("Fetch error:", err);
+    throw err;
+  });
+};
+
+  sendData()
+  .then(() => {
+    const dateObj = new Date(tanggal + 'T00:00:00');
+    const tgl = dateObj.toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    const antrian = 'A-' + Math.floor(Math.random()*90+10);
+
+    document.getElementById('modalNama').textContent = nama;
+    document.getElementById('modalDokter').textContent = dokter;
+    document.getElementById('modalWaktu').textContent = `${tgl}, ${jam} WIB`;
+    document.getElementById('modalAntrian').textContent = antrian;
+
+    const pesan = `Halo Klinik ABC, saya ingin konfirmasi booking:%0A%0ANama: ${nama}%0ADokter: ${dokter}%0AJadwal: ${tgl} jam ${jam} WIB%0ANo. Antrian: ${antrian}`;
+    document.getElementById('waLink').href = `https://wa.me/6281234567890?text=${pesan}`;
+
+    const bm = bootstrap.Modal.getInstance(document.getElementById('bookingModal'));
+    bm.hide();
+    setTimeout(() => {
+      new bootstrap.Modal(document.getElementById('successModal')).show();
+    }, 400);
+
+    this.reset();
+    btn.disabled = false;
+    btnText.innerHTML = '<i class="bi bi-send me-2"></i>Kirim Booking';
+    btnLoader.classList.add('d-none');
+      })
+  .catch(() => {
+    alert("Terjadi kesalahan saat booking!");
+
+  });
+});
+
+function toggleChat() {
+  const chatWindow = document.getElementById('n8n-chat-window');
+  chatWindow.classList.toggle('show');
+}
+
+</script>
+</body>
+</html>

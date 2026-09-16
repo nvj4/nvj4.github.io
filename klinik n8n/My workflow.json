@@ -1,0 +1,530 @@
+{
+  "name": "Klinik Enterprise Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking-baru",
+        "options": {}
+      },
+      "id": "30d40536-c267-4313-be17-da2039290e14",
+      "name": "Webhook Booking",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        9504,
+        2688
+      ],
+      "webhookId": "092eb8c1-ab82-41a3-a5ec-66929a390eaa"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.body.nama_pasien}}",
+              "operation": "isNotEmpty"
+            },
+            {
+              "value1": "={{$json.body.no_hp}}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "728c0548-16a1-4ca0-af7b-333009605ca3",
+      "name": "Validasi Input",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        9760,
+        2688
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT COUNT(*) as total FROM booking WHERE tanggal='{{ $json.body.tanggal }}' AND jam='{{ $json.body.jam }}' AND id_dokter='{{ $json.body.id_dokter }}'",
+        "options": {}
+      },
+      "id": "0dd3f1c8-9ad6-4cb2-9ee8-6b303580712f",
+      "name": "Cek Jadwal Bentrok",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2,
+      "position": [
+        10016,
+        2688
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "RSVFPOqRCIpuP2hL",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.total}}",
+              "value2": 5
+            }
+          ]
+        }
+      },
+      "id": "1f46607a-481e-46dc-bae1-319d5c820be4",
+      "name": "IF Slot Tersedia",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        10256,
+        2688
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const random = Math.floor(Math.random() * 1000);\nitems[0].json.kode_booking = `BK-${Date.now()}-${random}`;\nreturn items;"
+      },
+      "id": "470065af-e02f-4428-bd0c-97fdf77e6f2a",
+      "name": "Generate Kode Booking",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        10512,
+        2592
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO booking (nama_pasien,no_hp,email,id_dokter,tanggal,jam,status,kode_booking,keluhan_catatan) VALUES ('{{ $json.body.nama_pasien }}','{{ $json.body.no_hp }}','{{ $json.body.email }}','{{ $json.body.id_dokter }}','{{ $json.body.tanggal }}','{{ $json.body.jam }}','pending','{{ $json.kode_booking }}','{{ $json.body.keluhan_catatan }}')",
+        "options": {}
+      },
+      "id": "3f5fd213-939e-4bab-b75f-e9f75315af75",
+      "name": "Insert Booking",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2,
+      "position": [
+        10768,
+        2592
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "RSVFPOqRCIpuP2hL",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "XM8DywHvmFZhSgMJcT2p"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"target\":\"{{$node['Webhook Booking'].json.body.no_hp}}\",\n\"message\":\"Halo {{$node['Webhook Booking'].json.body.nama_pasien}}\\n\\nBooking berhasil ✅\\n\\nKode Booking: {{$item(0).$node[\\\"Generate Kode Booking\\\"].json[\\\"kode_booking\\\"]}}\\nTanggal: {{$node['Webhook Booking'].json.body.tanggal}}\\nJam: {{$node['Webhook Booking'].json.body.jam}}\\n\\nKeluhan: {{$node['Webhook Booking'].json.body.keluhan_catatan}}\\n\\nHarap datang 15 menit lebih awal.\"\n}",
+        "options": {}
+      },
+      "id": "b9689ce8-6fa1-44c6-b105-ec3564431d9f",
+      "name": "WA Pasien",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        11008,
+        2592
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "XM8DywHvmFZhSgMJcT2p"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"target\":\"62895614686259\",\n\"message\":\"Booking baru masuk\\n\\nPasien: {{$node['Webhook Booking'].json.body.nama_pasien}}\\nTanggal: {{$node['Webhook Booking'].json.body.tanggal}}\\nJam: {{$node['Webhook Booking'].json.body.jam}}\"\n}",
+        "options": {}
+      },
+      "id": "f7cbcf43-a336-42db-95ca-c0afafdb7c34",
+      "name": "WA Admin",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        11264,
+        2592
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO notifikasi_log(nama_pasien, nomor, pesan, status) VALUES('{{ $json.body.nama_pasien }}','{{ $json.body.no_hp }}','Booking berhasil','SUCCESS')",
+        "options": {}
+      },
+      "id": "52b07a91-59e8-4817-b66f-70a05e025ae6",
+      "name": "Log Notifikasi",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2,
+      "position": [
+        11504,
+        2592
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "RSVFPOqRCIpuP2hL",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "XM8DywHvmFZhSgMJcT2p"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n\"target\":\"{{$json.body.no_hp}}\",\n\"message\":\"Maaf, jadwal dokter yang dipilih sudah penuh. Silakan pilih jadwal lain 🙏\"\n}",
+        "options": {}
+      },
+      "id": "712dd509-3ee6-412d-8ec0-f345c16b7297",
+      "name": "WA Jadwal Penuh",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        10512,
+        2848
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "60c97823-f0d4-4b99-b3ab-62fcb023b10c",
+      "name": "Schedule Reminder",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        9504,
+        2384
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT booking.*, dokter.nama_dokter FROM booking LEFT JOIN dokter ON booking.id_dokter = dokter.id_dokter WHERE tanggal = DATE_ADD(CURDATE(), INTERVAL 1 DAY) AND status='pending'",
+        "options": {}
+      },
+      "id": "ddfd81a7-4f36-41f8-97ea-4a22d3257d37",
+      "name": "Ambil Reminder",
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2,
+      "position": [
+        9760,
+        2384
+      ],
+      "credentials": {
+        "mySql": {
+          "id": "RSVFPOqRCIpuP2hL",
+          "name": "MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.fonnte.com/send",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "XM8DywHvmFZhSgMJcT2p"
+            }
+          ]
+        },
+        "sendBody": true,
+    "specifyBody": "json",
+    "jsonBody": "={\n  \"target\": \"{{ $json.no_hp }}\",\n  \"message\": \"Halo {{ $json.nama_pasien }}, ini pengingat bahwa BESOK Anda memiliki jadwal dengan {{ $json.nama_dokter }} pukul {{ $json.jam }}\"\n}",
+    "options": {}
+      },
+      "id": "b33f5d82-79ec-40d1-b299-34aa4f48d646",
+      "name": "WA Reminder",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        10016,
+        2384
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "Kamu adalah Customer Service Klinik Enterprise yang ramah dan profesional. Tugasmu membantu pasien menjawab pertanyaan seputar layanan klinik. Jika mereka ingin booking, gunakan tool Google Calendar untuk mengecek jadwal kosong atau mendaftarkan janji temu mereka."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        9968,
+        3056
+      ],
+      "id": "eda600f7-ed5b-4728-b975-e2ea80ee1e8a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        9632,
+        3072
+      ],
+      "id": "a86c4d9c-e0a6-4bc1-b78b-894ed30e0493",
+      "name": "When chat message received",
+      "webhookId": "19a4bd01-5be2-406f-a04b-739a290b752b"
+    },
+    {
+      "parameters": {
+        "model": "gemini-1.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        9840,
+        3264
+      ],
+      "id": "08d64005-2f05-464c-9dc2-c3e0a4f55f7d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "ZcPYm74YDubhMPFe",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 50
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        10064,
+        3232
+      ],
+      "id": "716297eb-b971-493e-b0de-fd2166c2d9e3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "calendar": "primary",
+        "additionalFields": {
+          "description": "Booking via AI Chat Klinik"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.2,
+      "position": [
+        10176,
+        3312
+      ],
+      "id": "49d03bba-e350-42bb-a9f8-f017c9a02c5d",
+      "name": "Create an event in Google Calendar"
+    }
+  ],
+  "connections": {
+    "Webhook Booking": {
+      "main": [
+        [
+          {
+            "node": "Validasi Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validasi Input": {
+      "main": [
+        [
+          {
+            "node": "Cek Jadwal Bentrok",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cek Jadwal Bentrok": {
+      "main": [
+        [
+          {
+            "node": "IF Slot Tersedia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Slot Tersedia": {
+      "main": [
+        [
+          {
+            "node": "Generate Kode Booking",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "WA Jadwal Penuh",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Kode Booking": {
+      "main": [
+        [
+          {
+            "node": "Insert Booking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Booking": {
+      "main": [
+        [
+          {
+            "node": "WA Pasien",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WA Pasien": {
+      "main": [
+        [
+          {
+            "node": "WA Admin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WA Admin": {
+      "main": [
+        [
+          {
+            "node": "Log Notifikasi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Reminder": {
+      "main": [
+        [
+          {
+            "node": "Ambil Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ambil Reminder": {
+      "main": [
+        [
+          {
+            "node": "WA Reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}
