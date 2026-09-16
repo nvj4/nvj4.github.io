@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Prediksi Penjualan Daging - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="stylelogin.css">
+</head>
+<body>
+    <!-- Floating shapes decoration -->
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    
+    <div class="login-container">
+        <div class="login-header">
+            <h2>Login Dashboard</h2>
+            <p>Toko Daging Bekasi</p>
+        </div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-wrapper">
+                    <input type="text" id="username" name="username" placeholder="Masukkan username Anda" required>
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" name="password" placeholder="Masukkan password Anda" required>
+                    <i class="fas fa-lock"></i>
+                </div>
+            </div>
+            
+            <button type="submit" class="login-button">
+                <span id="button-text">Masuk</span>
+                <div class="spinner" id="spinner"></div>
+            </button>
+            
+            <!-- Area untuk menampilkan pesan sukses/error -->
+            <div id="message-box" role="alert" aria-live="assertive"></div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('loginForm');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const messageBox = document.getElementById('message-box');
+            const buttonText = document.getElementById('button-text');
+            const spinner = document.getElementById('spinner');
+
+            // Kredensial yang diatur
+            const CORRECT_USERNAME = 'admin';
+            const CORRECT_PASSWORD = 'admin123';
+            const REDIRECT_PAGE = 'tes_pwa.html';
+
+            // Fungsi untuk menampilkan pesan
+            function showMessage(message, type) {
+                messageBox.textContent = message;
+                messageBox.className = 'message-box';
+                messageBox.classList.add(`message-${type}`, 'show');
+                
+                // Auto hide error message after 3 seconds
+                if (type === 'error') {
+                    setTimeout(() => {
+                        messageBox.classList.remove('show');
+                        setTimeout(() => {
+                            messageBox.textContent = '';
+                            messageBox.className = 'message-box';
+                        }, 300);
+                    }, 3000);
+                }
+            }
+
+            // Handler untuk submit form
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault(); // Mencegah submit form default
+
+                const enteredUsername = usernameInput.value.trim();
+                const enteredPassword = passwordInput.value.trim();
+
+                // Show loading state
+                buttonText.style.display = 'none';
+                spinner.style.display = 'block';
+                form.querySelector('.login-button').disabled = true;
+
+                // Simulate API call delay
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                // Periksa kredensial
+                if (enteredUsername === CORRECT_USERNAME && enteredPassword === CORRECT_PASSWORD) {
+                    // Kredensial Benar (Sukses)
+                    showMessage('Login Berhasil! Mengalihkan ke Dashboard...', 'success');
+                    
+                    // Reset form state
+                    buttonText.style.display = 'inline';
+                    spinner.style.display = 'none';
+                    
+                    // Lakukan pengalihan setelah jeda singkat
+                    setTimeout(() => {
+                        window.location.href = REDIRECT_PAGE;
+                    }, 1500); // Tunggu 1.5 detik sebelum redirect
+                    
+                } else {
+                    // Kredensial Salah (Gagal)
+                    showMessage('Username atau Password Salah. Silakan coba lagi.', 'error');
+                    
+                    // Reset form state
+                    buttonText.style.display = 'inline';
+                    spinner.style.display = 'none';
+                    form.querySelector('.login-button').disabled = false;
+                    
+                    // Kosongkan input password untuk keamanan
+                    passwordInput.value = ''; 
+                    
+                    // Shake animation for error
+                    form.style.animation = 'shake 0.5s';
+                    setTimeout(() => {
+                        form.style.animation = '';
+                    }, 500);
+                }
+            });
+
+            // Add input focus effects
+            [usernameInput, passwordInput].forEach(input => {
+                input.addEventListener('focus', () => {
+                    input.parentElement.parentElement.classList.add('focused');
+                });
+                
+                input.addEventListener('blur', () => {
+                    input.parentElement.parentElement.classList.remove('focused');
+                });
+            });
+        });
+
+        // Shake animation for error
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+                20%, 40%, 60%, 80% { transform: translateX(10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

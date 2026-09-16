@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Prediksi Penjualan Daging - Toko Daging Bekasi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+        <i class="fas fa-moon" id="darkModeIcon"></i>
+    </button>
+    
+    <!-- Toggle Sidebar Button - Only visible on mobile -->
+    <button class="toggle-sidebar" onclick="toggleSidebar()">
+        <div class="burger-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </button>
+    
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeSidebarOnMobile()"></div>
+    
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <img src="icons/1.png" alt="Logo" class="w-10 h-10 object-contain">
+            </div>
+            <h2 class="text-xl font-bold">Toko Daging Bekasi</h2>
+        </div>
+        <nav class="sidebar-menu">
+            <a class="menu-item" onclick="showPage('dashboard')">
+                <i class="fas fa-chart-line"></i>
+                <span class="menu-text">Dashboard</span>
+            </a>
+            <a class="menu-item" onclick="showPage('input')">
+                <i class="fas fa-plus-circle"></i>
+                <span class="menu-text">Input Data</span>
+            </a>
+            <a class="menu-item" onclick="showPage('upload')">
+                <i class="fas fa-upload"></i>
+                <span class="menu-text">Upload Excel</span>
+            </a>
+            <a class="menu-item" onclick="showPage('report')">
+                <i class="fas fa-file-alt"></i>
+                <span class="menu-text">Laporan Penjualan</span>
+            </a>
+            <a class="menu-item active" onclick="showPage('prediction')">
+                <i class="fas fa-brain"></i>
+                <span class="menu-text">Prediksi</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a class="menu-item" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="menu-text">Logout</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="text-2xl font-bold text-gray-800" id="pageTitle">Dashboard</h1>
+            <div class="flex items-center gap-4">
+                <span class="text-gray-600">
+                    <i class="fas fa-calendar-alt mr-2"></i>
+                    <span id="currentDate"></span>
+                </span>
+            </div>
+        </header>
+        
+        <!-- Content -->
+        <div class="content">
+            <!-- Dashboard Page -->
+            <div id="dashboardPage" class="page">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="card stat-card red card-animation" style="animation-delay: 0.1s">
+                        <div class="stat-card-content">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-lg font-semibold">Total Transaksi</h3>
+                                <i class="fas fa-shopping-cart text-2xl opacity-50"></i>
+                            </div>
+                            <p class="text-3xl font-bold" id="totalTransactions">0</p>
+                            <p class="text-sm opacity-80">transaksi</p>
+                        </div>
+                        <i class="fas fa-shopping-cart stat-card-icon"></i>
+                    </div>
+                    
+                    <div class="card stat-card green card-animation" style="animation-delay: 0.2s">
+                        <div class="stat-card-content">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-lg font-semibold">Total Penjualan</h3>
+                                <i class="fas fa-weight text-2xl opacity-50"></i>
+                            </div>
+                            <p class="text-3xl font-bold" id="totalSales">0</p>
+                            <p class="text-sm opacity-80">kg</p>
+                        </div>
+                        <i class="fas fa-weight stat-card-icon"></i>
+                    </div>
+                    
+                    <div class="card stat-card orange card-animation" style="animation-delay: 0.3s">
+                        <div class="stat-card-content">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-lg font-semibold">Rata-rata Harian</h3>
+                                <i class="fas fa-chart-bar text-2xl opacity-50"></i>
+                            </div>
+                            <p class="text-3xl font-bold" id="avgDaily">0</p>
+                            <p class="text-sm opacity-80">kg/hari</p>
+                        </div>
+                        <i class="fas fa-chart-bar stat-card-icon"></i>
+                    </div>
+                    
+                    <div class="card stat-card purple card-animation" style="animation-delay: 0.4s">
+                        <div class="stat-card-content">
+                            <div class="flex items-center justify-between mb-3">
+                                <h3 class="text-lg font-semibold">Prediksi Besok</h3>
+                                <i class="fas fa-crystal-ball text-2xl opacity-50"></i>
+                            </div>
+                            <p class="text-3xl font-bold" id="predictionTomorrow">0</p>
+                            <p class="text-sm opacity-80">kg</p>
+                            <div class="accuracy-indicator accuracy-high" id="predictionAccuracy">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Akurasi Tinggi</span>
+                            </div>
+                        </div>
+                        <i class="fas fa-crystal-ball stat-card-icon"></i>
+                    </div>
+                </div>
+                
+                <!-- Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <div class="card card-animation" style="animation-delay: 0.5s">
+                        <h3 class="text-lg font-semibold mb-4">Tren Penjualan (7 Hari Terakhir)</h3>
+                        <div class="chart-container">
+                            <canvas id="salesTrendChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="card card-animation" style="animation-delay: 0.6s">
+                        <h3 class="text-lg font-semibold mb-4">Proporsi Jenis Daging</h3>
+                        <div class="chart-container">
+                            <canvas id="meatTypeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card card-animation" style="animation-delay: 0.7s">
+                    <h3 class="text-lg font-semibold mb-4">Prediksi Penjualan 7 Hari ke Depan</h3>
+                    <div class="chart-container">
+                        <canvas id="predictionChart"></canvas>
+                    </div>
+                    <div class="prediction-details">
+                        <h4>Detail Prediksi</h4>
+                        <p>Prediksi ini dibuat menggunakan algoritma Naive Bayes berdasarkan data historis penjualan.</p>
+                        <p>Akurasi prediksi: <span id="predictionAccuracyText">Tinggi (85-95%)</span></p>
+                    </div>
+                </div>
+            </div>
+            
+           <!-- Input Data Page -->
+<div id="inputPage" class="page hidden">
+    <div class="card max-w-2xl mx-auto card-animation">
+        <h2 class="text-2xl font-bold mb-6">Input Data Transaksi</h2>
+        <form id="inputForm" onsubmit="handleInputSubmit(event)">
+            <div class="form-group">
+                <label class="form-label">Tanggal</label>
+                <input type="date" class="form-input" id="inputDate" required>
+                <div class="error-message" id="dateError" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Tanggal tidak valid</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Jenis Daging</label>
+                <select class="form-input" id="inputMeatType" required>
+                    <option value="">Pilih jenis daging</option>
+                </select>
+                <div class="error-message" id="typeError" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Pilih jenis daging</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Kualitas Daging</label>
+                <select class="form-input" id="inputKualitas" required>
+                    <option value="standar">Standar</option>
+                    <option value="premium">Premium</option>
+                </select>
+                <div class="error-message" id="kualitasError" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Pilih kualitas daging</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Status Hari</label>
+                <select class="form-input" id="inputStatusHari" required>
+                    <option value="hari kerja">Hari Kerja</option>
+                    <option value="libur nasional">Libur Nasional</option>
+                    <option value="hari libur">Hari Libur</option>
+                </select>
+                <div class="error-message" id="statusHariError" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Pilih status hari</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Jumlah (kg)</label>
+                <input type="number" class="form-input" id="inputAmount" step="0.1" min="0" required>
+                <div class="error-message" id="amountError" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Jumlah harus angka positif</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Harga (Rp)</label>
+                <input type="number" class="form-input" id="inputHarga" min="0" placeholder="Contoh: 130000" required>
+                <div class="error-message" id="hargaError" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Harga harus angka positif</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Promo</label>
+                <select class="form-input" id="inputPromo" required>
+                    <option value="tidak">Tidak Ada</option>
+                    <option value="ada">Ada Promo</option>
+                </select>
+                <div class="error-message" id="promoError" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Pilih status promo</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Metode Penjualan</label>
+                <select class="form-input" id="inputMetode" required>
+                    <option value="offline">Offline (Toko)</option>
+                    <option value="online">Online (Delivery)</option>
+                </select>
+                <div class="error-message" id="metodeError" style="display: none;">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Pilih metode penjualan</span>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                Simpan Data
+            </button>
+        </form>
+    </div>
+</div>
+            
+            <!-- Upload Excel Page -->
+            <!-- Upload Excel Page -->
+<div id="uploadPage" class="page hidden">
+    <div class="card max-w-2xl mx-auto card-animation">
+        <h2 class="text-2xl font-bold mb-6">Upload File Excel</h2>
+        <div class="upload-area" id="uploadArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+            <i class="fas fa-cloud-upload-alt text-6xl text-gray-400 mb-4"></i>
+            <p class="text-lg font-semibold mb-2">Drag & Drop file Excel di sini</p>
+            <p class="text-gray-600 mb-4">atau</p>
+            <input type="file" id="excelFile" accept=".xlsx,.xls" style="display: none;" onchange="handleFileSelect(event)">
+            <button class="btn btn-primary" onclick="document.getElementById('excelFile').click()">
+                <i class="fas fa-folder-open"></i>
+                Pilih File
+            </button>
+        </div>
+        <div class="mt-4 text-sm text-gray-600">
+            <p><strong>Format Excel:</strong> Kolom A = tanggal, Kolom B = jenis_daging, Kolom C = jumlah_kg</p>
+            <p>Contoh: 2024-01-01 | Sapi | 10.5</p>
+            <p class="text-red-500 mt-2"><strong>Note:</strong> Tanggal harus format YYYY-MM-DD dan jumlah harus angka positif</p>
+        </div>
+        
+        <!-- Save Data Button -->
+        <div class="mt-6">
+            <button class="btn btn-success" onclick="saveData()">
+                <i class="fas fa-save"></i>
+                Simpan Data
+            </button>
+        </div>
+    </div>
+</div>
+            
+          <!-- Report Page -->
+<div id="reportPage" class="page hidden">
+    <div class="mb-6">
+        <div class="flex items-center gap-4 flex-wrap">
+            <div class="select-wrapper">
+                <select class="form-input form-select" id="reportType" onchange="generateReport()">
+                    <option value="transaction">Laporan Transaksi</option>
+                    <option value="frequency">Laporan Frekuensi Penjualan</option>
+                    <option value="bestmeat">Laporan Jenis Daging Terlaris</option>
+                    <option value="avgweight">Laporan Rata-rata Berat Pembelian</option>
+                </select>
+            </div>
+            <button class="btn btn-success" onclick="downloadReport()">
+                <i class="fas fa-download"></i>
+                Download Laporan
+            </button>
+        </div>
+    </div>
+    
+    <div id="reportContainer">
+        <!-- Report cards will be populated here -->
+    </div>
+</div>
+<!-- Prediction Page -->
+<div id="predictionPage" class="page hidden">
+    <!-- Button Navigation -->
+    <div class="button-nav">
+        <button class="nav-button" onclick="switchTab('transaksi')">
+            <i class="fas fa-exchange-alt"></i>
+            Transaksi
+        </button>
+        <button class="nav-button" onclick="switchTab('prediksi')">
+            <i class="fas fa-brain"></i>
+            Prediksi
+        </button>
+    </div>
+    
+    <!-- Default View (Awal Mula Klik Menu Prediksi) - berisi chart dari DB (beda tipe dari Dashboard) -->
+    <div id="defaultTab" class="tab-content">
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="card">
+                <h3 class="text-lg font-semibold mb-4">Volume Penjualan Harian (14 Hari Terakhir)</h3>
+                <div class="chart-container">
+                    <canvas id="predOverviewTrendChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h3 class="text-lg font-semibold mb-4">Sebaran Jenis Daging</h3>
+                <div class="chart-container">
+                    <canvas id="predOverviewMeatChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prediction Summary Chart -->
+        <div class="card">
+            <h3 class="text-lg font-semibold mb-4">Ringkasan Prediksi Tersimpan per Jenis Daging</h3>
+            <div class="chart-container">
+                <canvas id="predOverviewPredictionChart"></canvas>
+            </div>
+            <div id="predOverviewNoPrediction" class="empty-state hidden">
+                <i class="fas fa-chart-line"></i>
+                <h3>Belum Ada Data Prediksi</h3>
+                <p>Klik tombol <strong>Prediksi</strong> lalu <strong>Hitung Prediksi</strong> untuk menghasilkan data.</p>
+            </div>
+            <p class="text-xs text-gray-500 mt-3">Silakan klik tombol <strong>Transaksi</strong> untuk melihat history data, atau klik <strong>Prediksi</strong> untuk mulai menghitung prediksi penjualan.</p>
+        </div>
+    </div>
+
+    <!-- Transaksi Tab Content -->
+    <div id="transaksiTab" class="tab-content hidden">
+        <div class="card card-animation">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">Data Transaksi</h3>
+            </div>
+            
+            <!-- Add Transaction Form (Hidden by default) -->
+            <div id="addTransactionForm" class="edit-form" style="display: none;">
+                <h4 class="text-md font-semibold mb-3">Tambah Transaksi Baru</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">Tanggal</label>
+                        <input type="date" class="form-input" id="newTransactionDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Jenis Daging</label>
+                        <select class="form-input" id="newTransactionType" required>
+                            <option value="">Pilih jenis daging</option>
+                            <option value="Sapi">Sapi</option>
+                            <option value="Ayam">Ayam</option>
+                            <option value="Kambing">Kambing</option>
+                            <option value="Ikan">Ikan</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Jumlah (kg)</label>
+                        <input type="number" class="form-input" id="newTransactionAmount" step="0.1" min="0" required>
+                    </div>
+                </div>
+                <div class="edit-form-actions">
+                    <button class="btn btn-secondary" onclick="hideAddTransactionForm()">Batal</button>
+                    <button class="btn btn-primary" onclick="addTransaction()">
+                        <i class="fas fa-save"></i>
+                        Simpan
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Transaction Table -->
+            <div class="data-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Tanggal</th>
+                            <th>Jenis Daging</th>
+                            <th>Kualitas</th>
+                            <th>Status Hari</th>
+                            <th>Jumlah (kg)</th>
+                            <th>Harga (Rp)</th>
+                            <th>Promo</th>
+                            <th>Metode</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody">
+                        <!-- Transaction rows will be populated here -->
+                    </tbody>
+                </table>
+                <div id="noTransactionData" class="empty-state hidden">
+                    <i class="fas fa-inbox"></i>
+                    <h3>Belum Ada Data Transaksi</h3>
+                    <p>Tambahkan data transaksi untuk melihat informasi di sini.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Prediksi Tab Content (Muncul setelah klik button Prediksi) -->
+    <div id="prediksiTab" class="tab-content hidden">
+        <div class="card card-animation">
+            <div class="prediction-actions">
+                <h3 class="text-lg font-semibold">Data Prediksi Penjualan</h3>
+                <button id="btnRunPrediction" class="btn btn-primary" onclick="calculatePredictions()">
+                    <i class="fas fa-calculator"></i>
+                    Hitung Prediksi
+                </button>
+            </div>
+            
+            <div class="prediction-info">
+                <p><strong>Metode:</strong> Algoritma Naive Bayes</p>
+                <p><strong>Periode Prediksi:</strong> 7 Hari ke Depan</p>
+                <p id="lastUpdated"><strong>Terakhir Diperbarui:</strong> Belum ada prediksi</p>
+            </div>
+            
+            <!-- Prediction Table -->
+            <div class="prediction-table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Jenis Daging</th>
+                            <th>Prediksi (kg)</th>
+                            <th>Kategori</th>
+                            <th>Akurasi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="predictionTableBody">
+                        <!-- Prediction rows will be populated here -->
+                    </tbody>
+                </table>
+                <div id="noPredictionData" class="empty-state">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Belum Ada Data Prediksi</h3>
+                    <p>Klik tombol "Hitung Prediksi" untuk menghasilkan prediksi penjualan.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confusion Matrix -->
+<div id="confusionModal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;padding:16px;">
+    <div style="background:white;border-radius:16px;padding:28px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 25px 50px rgba(0,0,0,0.25);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="font-size:18px;font-weight:700;margin:0;">Hasil Klasifikasi Kategori</h3>
+            <button onclick="document.getElementById('confusionModal').style.display='none'" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="confusionModalContent"></div>
+    </div>
+</div>
+    
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4" id="modalTitle">Konfirmasi</h3>
+            <p class="mb-6" id="modalMessage">Apakah Anda yakin ingin melanjutkan?</p>
+            <div class="flex justify-end gap-4">
+                <button class="btn btn-secondary" onclick="closeModal()">Batal</button>
+                <button class="btn btn-danger" id="modalConfirmBtn" onclick="confirmModalAction()">Hapus</button>
+            </div>
+        </div>
+    </div>
+    
+   <!-- Modal Edit Transaksi -->
+<div id="editModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:12px;padding:24px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;margin:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h2 style="font-size:20px;font-weight:700;margin:0;">Edit Transaksi</h2>
+            <button onclick="closeEditModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280;padding:4px;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form id="editForm" onsubmit="saveEditedTransaction(event)">
+            <input type="hidden" id="editTransactionId">
+            
+            <div class="form-group">
+                <label class="form-label">Tanggal</label>
+                <input type="date" class="form-input" id="editDate" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Jenis Daging</label>
+                <select class="form-input" id="editType" required>
+                    <option value="">Pilih jenis daging</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Kualitas Daging</label>
+                <select class="form-input" id="editKualitas" required>
+                    <option value="standar">Standar</option>
+                    <option value="premium">Premium</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Status Hari</label>
+                <select class="form-input" id="editStatusHari" required>
+                    <option value="hari kerja">Hari Kerja</option>
+                    <option value="libur nasional">Libur Nasional</option>
+                    <option value="hari libur">Hari Libur</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Jumlah (kg)</label>
+                <input type="number" class="form-input" id="editAmount" step="0.1" min="0" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Harga (Rp)</label>
+                <input type="number" class="form-input" id="editHarga" min="0" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Promo</label>
+                <select class="form-input" id="editPromo" required>
+                    <option value="tidak">Tidak Ada</option>
+                    <option value="ada">Ada Promo</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Metode Penjualan</label>
+                <select class="form-input" id="editMetode" required>
+                    <option value="offline">Offline (Toko)</option>
+                    <option value="online">Online (Delivery)</option>
+                </select>
+            </div>
+            
+            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+                <button type="button" onclick="closeEditModal()" class="btn" style="background:#6b7280;color:white;">Batal</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <!-- Loading Overlay -->
+<div id="loadingOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:10001;align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:16px;padding:32px 40px;text-align:center;box-shadow:0 25px 50px rgba(0,0,0,0.25);">
+        <div style="width:44px;height:44px;border:4px solid #e5e7eb;border-top-color:#B91C1C;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px;"></div>
+        <p style="font-weight:700;font-size:14px;color:#1f2937;margin:0;">Membuat PDF...</p>
+        <p style="font-size:11px;color:#9ca3af;margin:4px 0 0;">Mohon tunggu sebentar</p>
+    </div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<!-- Preview Overlay -->
+<div id="pdfPreviewOverlay" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.7);backdrop-filter:blur(2px);flex-direction:column;">
+    <!-- Toolbar -->
+    <div style="flex-shrink:0;background:#1c1917;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <i class="fas fa-file-pdf" style="color:#ef4444;font-size:16px;"></i>
+            <span id="previewTitle" style="color:#f5f5f4;font-weight:600;font-size:13px;">Preview Laporan</span>
+        </div>
+        <div style="display:flex;gap:8px;">
+            <button onclick="cetakDariPreview()" style="background:linear-gradient(135deg,#B91C1C,#991B1B);color:white;border:none;padding:7px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
+                <i class="fas fa-print" style="font-size:11px;"></i> Cetak PDF
+            </button>
+            <button onclick="tutupPreview()" style="background:rgba(255,255,255,0.1);color:#d6d3d1;border:1px solid rgba(255,255,255,0.15);padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;">
+                <i class="fas fa-times" style="font-size:11px;"></i> Tutup
+            </button>
+        </div>
+    </div>
+    <!-- Scrollable Content -->
+    <div style="flex:1;overflow:auto;display:flex;justify-content:center;padding:24px 16px;">
+        <div id="pdfPageContent" style="flex-shrink:0;"></div>
+    </div>
+</div>
+
+    <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js")
+      .then(reg => console.log("Service Worker terdaftar:", reg))
+      .catch(err => console.log("Service Worker gagal:", err));
+  }
+</script>
+    
+   <script src="api.js"></script>
+   <script src="script.js"></script>
+
+</body>
+</html>
